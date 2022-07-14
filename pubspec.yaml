@@ -79,6 +79,8 @@ dependencies:
   mapbox_gl: ^0.15.0
   # Shimmer
   shimmer: ^2.0.0
+  # Calendar carousel
+  flutter_calendar_carousel: ^2.4.0
 
 
 dev_dependencies:

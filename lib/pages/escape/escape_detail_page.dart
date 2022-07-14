@@ -13,6 +13,7 @@ import 'package:flutter_escaperank_web/utils/app_sizing.dart';
 import 'package:flutter_escaperank_web/utils/app_text_styles.dart';
 import 'package:flutter_escaperank_web/utils/image_utils.dart';
 import 'package:flutter_escaperank_web/utils/map_utils.dart';
+import 'package:flutter_escaperank_web/widgets/booking/booking_widget.dart';
 import 'package:flutter_escaperank_web/widgets/buttons/topic_detail.dart';
 import 'package:flutter_escaperank_web/widgets/rows/ficha_tecnica.dart';
 import 'package:flutter_escaperank_web/widgets/text/standard_text.dart';
@@ -503,6 +504,12 @@ class _EscapeDetailPageState extends State<_MissionDetailPage> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
+                            BookingsWidget(
+                              escapeRoom: widget.escape,
+                            ),
+
+                            const SizedBox(height: 10),
+
                             widget.escape.images.isNotEmpty ?
                             Image.network(widget.escape.images[0].url) :
                             const SizedBox.shrink(),
