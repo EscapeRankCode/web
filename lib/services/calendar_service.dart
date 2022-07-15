@@ -19,19 +19,55 @@ class CalendarService{
   /// Return: [CalendarResponse] if ok, [Null] if request fails
   ///
   Future<CalendarResponse?> getCalendar(int escape_id, String start_date, String end_date) async {
-    Uri uri = Uri.https(Config.BASE_URL, BookingsLayerApi.getCalendarAvailability);
+    var headers = {
+      'ApiKey': API.apiKey,
+      'accept': 'application/json',
+      'Authorization': 'Bearer xosel0l0', // TODO: REMOVE THE BEARER
+    };
+
+    String url = 'http://' + Config.BASE_URL + BookingsLayerApi.getCalendarAvailability +
+        '?escape_id=' + escape_id.toString() +
+        '&start_date=' + start_date +
+        '&end_date=' + end_date;
+
+    print("\nURL is: " + url);
+
+
+    var request = http.Request('GET', Uri.parse(url));
+
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      print("--- Response is status 200");
+      String res = await response.stream.bytesToString();
+      print("-----> Response: " + res);
+      dynamic body = json.decode(res);
+      print("JSON: " + body);
+      return CalendarResponse.fromJson(body);
+    }
+    else {
+      print("--- Response is not status 200");
+      return null;
+    }
+
+    /*
     var jsonData = {
       "escape_id": escape_id,
       "start_date": start_date,
       "end_date": end_date
     };
-    final response = await http.post(
+    Uri uri = Uri.https(Config.BASE_URL, BookingsLayerApi.getCalendarAvailability, jsonData);
+
+    final response = await http.get(
       uri,
       headers: {
         'accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: json.encode(jsonData)
+        'Content-Type': 'application/json',
+        'ApiKey': API.apiKey,
+        'Authorization': 'Bearer xosel0l0' // TODO: REMOVE THE BEARER
+      }
     );
 
     if (response.statusCode == Responses.RESPONSE_OK){
@@ -40,6 +76,7 @@ class CalendarService{
     }
 
     return null;
+     */
   }
 
 }

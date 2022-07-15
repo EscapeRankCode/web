@@ -64,16 +64,15 @@ class CalendarWidget extends StatefulWidget{
 class CalendarWidgetState extends State<CalendarWidget>{
 
   DateTime now_datetime = DateTime.now();
+  DateTime _targetDateTime = DateTime.now();
 
-  String initial_day_month = "22/07/2022";
+  String initial_day_month = "26/07/2022";
   String final_day_month = "28/07/2022";
 
   ScrollController _scrollController = ScrollController();
-
   DateTime _currentDate = DateTime.now();
   DateTime _currentDate2 = DateTime.now();
-  String _currentMonth = DateFormat.MMMM("es_ES").format(DateTime.now());
-  DateTime _targetDateTime = DateTime.now();
+  String _currentMonth = DateFormat.MMMM("es_ES").format(DateTime.now()).toUpperCase();
   late String timezone;
   List<CalendarSimpleEvent> slotsEvents = [];
   // List<SlotTuritop> slotsSelected = [];
@@ -85,11 +84,13 @@ class CalendarWidgetState extends State<CalendarWidget>{
   late SharedPreferences prefs;
   var _calendarBloc;
   double heightCalendar = 340;
+  double widthCalendar = 340;
 
   
   @override
   void initState() {
     super.initState();
+    print("Loading events");
     loadEvents(
       initial_day_month,
       final_day_month
@@ -109,6 +110,7 @@ class CalendarWidgetState extends State<CalendarWidget>{
         start_date: startDate,
         end_date: endDate
     ));
+    print("Events called to be loaded!");
   }
 
   @override
@@ -133,6 +135,7 @@ class CalendarWidgetState extends State<CalendarWidget>{
       weekFormat: false,
       firstDayOfWeek: 1,
       height: heightCalendar,
+      width: widthCalendar,
       selectedDateTime: _currentDate2,
       targetDateTime: _targetDateTime,
       isScrollable: false,
@@ -179,23 +182,93 @@ class CalendarWidgetState extends State<CalendarWidget>{
       onCalendarChanged: (DateTime date) {
         setState(() {
           _targetDateTime = date;
-          _currentMonth = DateFormat.MMMM("es_ES").format(_targetDateTime);
+          _currentMonth = DateFormat.MMMM("es_ES").format(_targetDateTime).toUpperCase();
         });
       },
     );
 
     return BlocListener<CalendarBloc, CalendarState>(listener: (context, state) {
-      // TODO: NUEVA FORMA DE CONSTRUIR EL CALENDARIO
+
+      if (state is CalendarLoading){
+        print("Calendar Loading state");
+      }
+
       if (state is CalendarLoadedSuccess) {
         // timezone = state.calendarAvailability.data.calendar.timezone;
         slotsEvents = state.calendarAvailability.data.calendar.days[0].events; // TODO: #Invented
-        print("slots loaded!");
+        print("Calendar Loaded Success state");
 
         // maxSeatsEvent = state.product.data.maxSeatsBuy;
         // checkSlots();
       }
-    }, child: BlocBuilder<CalendarBloc, CalendarState>(builder: (context, state) {
-      return _calendarCarouselNoHeader;
+
+      if (state is CalendarLoadedFailure) {
+        print("Calendar Loading Failure state");
+      }
+
+    } , child: BlocBuilder<CalendarBloc, CalendarState>(builder: (context, state) {
+      return Column(
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back_ios, color: AppColors.greyText),
+                onPressed: (){
+                  setState((){
+                    var last_day_date = DateTime(_targetDateTime.year, _targetDateTime.month, 0);
+                    _targetDateTime = DateTime(_targetDateTime.year, _targetDateTime.month - 1);
+                    _currentMonth = DateFormat.MMMM("es_ES").format(_targetDateTime).toUpperCase();
+                    String _startDate = "01/" + _targetDateTime.month.toString() + "/" + _targetDateTime.year.toString();
+                    String _endDate = last_day_date.day.toString() + "/" + _targetDateTime.month.toString() + "/" + _targetDateTime.year.toString();
+                    loadEvents(
+                        _startDate,
+                        _endDate
+                    );
+                    var month = DateTime(_targetDateTime.year, _targetDateTime.month, 1);
+                    setState(() {
+                      heightCalendar = _targetDateTime.weekday >= 6 ? 340 : 290;
+                    });
+                  });
+                },
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+                child: StandardText(
+                  colorText: AppColors.whiteText,
+                  fontFamily: "Kanit_Regular",
+                  fontSize: 16,
+                  text: _currentMonth.toUpperCase(),
+                  align: TextAlign.center,
+                  lineHeight: 1,
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.arrow_forward_ios, color: AppColors.greyText),
+                onPressed: (){
+                  setState((){
+                    var last_day_date = DateTime(_targetDateTime.year, _targetDateTime.month + 2, 0);
+                    _targetDateTime = DateTime(_targetDateTime.year, _targetDateTime.month + 1);
+                    _currentMonth = DateFormat.MMMM("es_ES").format(_targetDateTime).toUpperCase();
+                    String _startDate = "01/" + _targetDateTime.month.toString() + "/" + _targetDateTime.year.toString();
+                    String _endDate = last_day_date.day.toString() + "/" + _targetDateTime.month.toString() + "/" + _targetDateTime.year.toString();
+                    loadEvents(
+                        _startDate,
+                        _endDate
+                    );
+                    var month = DateTime(_targetDateTime.year, _targetDateTime.month, 1);
+                    setState(() {
+                      heightCalendar = _targetDateTime.weekday >= 6 ? 340 : 290;
+                    });
+                  });
+                },
+              ),
+            ],
+          ),
+          _calendarCarouselNoHeader
+        ],
+      );
       /*
       return Padding(
         padding: const EdgeInsets.all(16.0),
