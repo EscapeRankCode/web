@@ -44,6 +44,8 @@ class EscapeRoom extends Equatable {
   final String score;
   List<Review> reviews;
   bool isFaved;
+  final int? bookingSystemId;
+  final int? bsConfigId;
 
   EscapeRoom({
     required this.id,
@@ -83,7 +85,9 @@ class EscapeRoom extends Equatable {
     required this.externalId,
     required this.isFaved,
     required this.score,
-    required this.reviews
+    required this.reviews,
+    required this.bookingSystemId,
+    required this.bsConfigId
   });
 
   @override
@@ -173,7 +177,9 @@ class EscapeRoom extends Equatable {
         images: imagesList,
         score: json["score"] != null ? (json["score"].toString().contains(".")? json["score"].toString() :
         json["score"].toString()+".0") : "-",
-        reviews: reviewsList
+        reviews: reviewsList,
+        bookingSystemId: json['booking_system_id'],
+        bsConfigId: json['bs_config_id']
     );
   }
 
