@@ -42,9 +42,7 @@ class CalendarService{
     if (response.statusCode == 200) {
       print("--- Response is status 200");
       String res = await response.stream.bytesToString();
-      print("-----> Response: " + res);
       dynamic body = json.decode(res);
-      print("JSON: " + body);
       return CalendarResponse.fromJson(body);
     }
     else {

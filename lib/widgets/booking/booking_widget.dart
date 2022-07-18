@@ -9,6 +9,7 @@ import 'package:flutter_escaperank_web/models/escape_room.dart';
 import 'package:flutter_escaperank_web/services/calendar_service.dart';
 import 'package:flutter_escaperank_web/utils/app_colors.dart';
 import 'package:flutter_escaperank_web/widgets/text/standard_text.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart' show CalendarCarousel, WeekdayFormat;
@@ -199,7 +200,7 @@ class CalendarWidgetState extends State<CalendarWidget>{
         print("Calendar Loaded Success state");
 
         // maxSeatsEvent = state.product.data.maxSeatsBuy;
-        // checkSlots();
+        checkSlots();
       }
 
       if (state is CalendarLoadedFailure) {
@@ -266,7 +267,8 @@ class CalendarWidgetState extends State<CalendarWidget>{
               ),
             ],
           ),
-          _calendarCarouselNoHeader
+          _calendarCarouselNoHeader,
+          // TODO: CONTAINER WITH HOURS IF SELECTED
         ],
       );
       /*
@@ -428,7 +430,7 @@ class CalendarWidgetState extends State<CalendarWidget>{
     }));
   }
 
-  /*
+
   void checkSlots() async {
     setState(() {
       slotsSelected.clear();
@@ -456,7 +458,6 @@ class CalendarWidgetState extends State<CalendarWidget>{
     _scrollController.animateTo(_scrollController.position.maxScrollExtent,
         duration: const Duration(milliseconds: 500), curve: Curves.ease);
   }
-   */
 
   /*
   Future<bool> showPhoneDialog() async {

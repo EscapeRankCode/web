@@ -29,13 +29,21 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState>{
     try{
       var calendar = await _calendarService.getCalendar(event.escape_id, event.start_date, event.end_date);
 
+      print("CALENDAR FROM JSON IS:");
+      print(calendar);
+
+
       if (calendar != null){
+        print("Calendar is not null");
         yield CalendarLoadedSuccess(calendarAvailability: calendar);
+
+      }else{
+        print("Calendar is null");
+        yield CalendarLoadedFailure(error: "error_get_calendar");
       }
 
-      yield CalendarLoadedFailure(error: "error_get_calendar");
-
     } catch(err){
+      print("Exception!");
       yield CalendarLoadedFailure(error: "error_get_calendar");
     }
     

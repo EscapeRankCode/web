@@ -3,8 +3,8 @@
 import 'package:flutter_escaperank_web/models/bookings_layer/calendar_general.dart';
 
 class CalendarData{
-  final String booking_system_id;
-  final String bs_config_id;
+  final int booking_system_id;
+  final int bs_config_id;
   final CalendarGeneral calendar;
 
   CalendarData({required this.booking_system_id, required this.bs_config_id, required this.calendar});
