@@ -1,14 +1,22 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_calendar_carousel/classes/event.dart';
 import 'package:flutter_escaperank_web/bloc/bookings_layer/calendar/calendar_bloc.dart';
 import 'package:flutter_escaperank_web/bloc/bookings_layer/calendar/calendar_event.dart';
 import 'package:flutter_escaperank_web/bloc/bookings_layer/calendar/calendar_state.dart';
+import 'package:flutter_escaperank_web/models/bookings_layer/calendar_day.dart';
+import 'package:flutter_escaperank_web/models/bookings_layer/calendar_general.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/calendar_simple_event.dart';
 import 'package:flutter_escaperank_web/models/escape_room.dart';
 import 'package:flutter_escaperank_web/services/calendar_service.dart';
 import 'package:flutter_escaperank_web/utils/app_colors.dart';
+import 'package:flutter_escaperank_web/utils/app_text_styles.dart';
+import 'package:flutter_escaperank_web/widgets/buttons/slot_time_row.dart';
+import 'package:flutter_escaperank_web/widgets/buttons/standard_button.dart';
+import 'package:flutter_escaperank_web/widgets/text/legend_circle.dart';
 import 'package:flutter_escaperank_web/widgets/text/standard_text.dart';
+import 'package:flutter_escaperank_web/widgets/text/title_circle.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart' show DateFormat;
@@ -36,9 +44,6 @@ class _BookingsWidgetState extends State<BookingsWidget>{
   Widget build(BuildContext context) {
     getSharedPreferences();
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.blackBackGround,
-        borderRadius: BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30))),
       alignment: Alignment.center,
       child: BlocProvider<CalendarBloc>(
         create: (context) => CalendarBloc(CalendarService()),
@@ -67,16 +72,14 @@ class CalendarWidgetState extends State<CalendarWidget>{
   DateTime now_datetime = DateTime.now();
   DateTime _targetDateTime = DateTime.now();
 
-  String initial_day_month = "26/07/2022";
-  String final_day_month = "28/07/2022";
+  String initial_day_month = "";
+  String final_day_month = "";
 
   ScrollController _scrollController = ScrollController();
   DateTime _currentDate = DateTime.now();
   DateTime _currentDate2 = DateTime.now();
   String _currentMonth = DateFormat.MMMM("es_ES").format(DateTime.now()).toUpperCase();
-  late String timezone;
-  List<CalendarSimpleEvent> slotsEvents = [];
-  // List<SlotTuritop> slotsSelected = [];
+
   int slotBooking = 0;
   String noSlotsDay = "";
   int maxSeatsEvent = 0;
@@ -87,15 +90,29 @@ class CalendarWidgetState extends State<CalendarWidget>{
   double heightCalendar = 340;
   double widthCalendar = 340;
 
+  List<CalendarSimpleEvent> slotsEvents = [];
+  CalendarGeneral? visibleCalendar;
+  late String timezone;
+  List<SlotTime> slotsSelected = [];
+  CalendarSimpleEvent? selectedEvent;
+
   
   @override
   void initState() {
     super.initState();
-    print("Loading events");
+    // Initial days
+    initial_day_month = DateFormat('dd/MM/yyyy').format(DateTime(now_datetime.year, now_datetime.month, 1));
+    final_day_month = DateFormat('dd/MM/yyyy').format(DateTime(now_datetime.year, now_datetime.month+1, 0));
+
+    // Load events of the actual month
     loadEvents(
       initial_day_month,
       final_day_month
     );
+
+    slotsSelected = [];
+
+    // Check actual month weeks length
     var month = DateTime(DateTime.now().year, DateTime.now().month, 1);
     setState(() {
       heightCalendar = month.weekday >= 6 ? 340 : 290;
@@ -104,7 +121,7 @@ class CalendarWidgetState extends State<CalendarWidget>{
   }
 
   void loadEvents(String startDate, String endDate) async {
-    prefs = await SharedPreferences.getInstance();
+    // prefs = await SharedPreferences.getInstance(); TODO: ONLY SHOW WHEN USER IS LOGGED
     _calendarBloc = BlocProvider.of<CalendarBloc>(context);
     _calendarBloc.add(GetCalendar(
         escape_id: widget.escapeRoom.id,
@@ -122,7 +139,7 @@ class CalendarWidgetState extends State<CalendarWidget>{
       onDayPressed: (date, events) {
         setState(() => _currentDate2 = date);
         print(_currentDate2);
-        // checkSlots();
+        checkSlots(date);
       },
       weekdayTextStyle: const TextStyle(
         fontSize: 16,
@@ -187,6 +204,21 @@ class CalendarWidgetState extends State<CalendarWidget>{
         });
       },
     );
+    
+    final _timesRow = Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        StandardText(
+            fontSize: AppTextStyles.escapeDetailCompanyBrandName.fontSize!,
+            text: "Sesiones el día " + DateFormat('dd/MM/yyyy').format(_currentDate2),
+            fontFamily: AppTextStyles.escapeDetailCompanyBrandName.fontFamily!,
+            colorText: AppColors.yellowPrimary,
+            align: TextAlign.start, lineHeight: 1
+        )
+      ],
+    );
+
 
     return BlocListener<CalendarBloc, CalendarState>(listener: (context, state) {
 
@@ -196,11 +228,17 @@ class CalendarWidgetState extends State<CalendarWidget>{
 
       if (state is CalendarLoadedSuccess) {
         // timezone = state.calendarAvailability.data.calendar.timezone;
-        slotsEvents = state.calendarAvailability.data.calendar.days[0].events; // TODO: #Invented
+        var days = state.calendarAvailability.data.calendar.days;
+        slotsEvents.clear();
+        slotsSelected.clear();
+        visibleCalendar = state.calendarAvailability.data.calendar;
+
+        // slotsEvents = state.calendarAvailability.data.calendar.days[0].events; // TODO: #Invented
         print("Calendar Loaded Success state");
 
         // maxSeatsEvent = state.product.data.maxSeatsBuy;
-        checkSlots();
+        // checkSlots(); TODO: MAYBE NECESSARY
+        setState((){});
       }
 
       if (state is CalendarLoadedFailure) {
@@ -208,242 +246,243 @@ class CalendarWidgetState extends State<CalendarWidget>{
       }
 
     } , child: BlocBuilder<CalendarBloc, CalendarState>(builder: (context, state) {
-      return Column(
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.arrow_back_ios, color: AppColors.greyText),
-                onPressed: (){
-                  setState((){
-                    var last_day_date = DateTime(_targetDateTime.year, _targetDateTime.month, 0);
-                    _targetDateTime = DateTime(_targetDateTime.year, _targetDateTime.month - 1);
-                    _currentMonth = DateFormat.MMMM("es_ES").format(_targetDateTime).toUpperCase();
-                    String _startDate = "01/" + _targetDateTime.month.toString() + "/" + _targetDateTime.year.toString();
-                    String _endDate = last_day_date.day.toString() + "/" + _targetDateTime.month.toString() + "/" + _targetDateTime.year.toString();
-                    loadEvents(
-                        _startDate,
-                        _endDate
-                    );
-                    var month = DateTime(_targetDateTime.year, _targetDateTime.month, 1);
-                    setState(() {
-                      heightCalendar = _targetDateTime.weekday >= 6 ? 340 : 290;
-                    });
-                  });
-                },
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-                child: StandardText(
-                  colorText: AppColors.whiteText,
-                  fontFamily: "Kanit_Regular",
-                  fontSize: 16,
-                  text: _currentMonth.toUpperCase(),
-                  align: TextAlign.center,
-                  lineHeight: 1,
-                ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.arrow_forward_ios, color: AppColors.greyText),
-                onPressed: (){
-                  setState((){
-                    var last_day_date = DateTime(_targetDateTime.year, _targetDateTime.month + 2, 0);
-                    _targetDateTime = DateTime(_targetDateTime.year, _targetDateTime.month + 1);
-                    _currentMonth = DateFormat.MMMM("es_ES").format(_targetDateTime).toUpperCase();
-                    String _startDate = "01/" + _targetDateTime.month.toString() + "/" + _targetDateTime.year.toString();
-                    String _endDate = last_day_date.day.toString() + "/" + _targetDateTime.month.toString() + "/" + _targetDateTime.year.toString();
-                    loadEvents(
-                        _startDate,
-                        _endDate
-                    );
-                    var month = DateTime(_targetDateTime.year, _targetDateTime.month, 1);
-                    setState(() {
-                      heightCalendar = _targetDateTime.weekday >= 6 ? 340 : 290;
-                    });
-                  });
-                },
-              ),
-            ],
-          ),
-          _calendarCarouselNoHeader,
-          // TODO: CONTAINER WITH HOURS IF SELECTED
-        ],
-      );
-      /*
-      return Padding(
-        padding: const EdgeInsets.all(16.0),
+      return SizedBox(
+        width: 400,
         child: Container(
-          constraints: const BoxConstraints.expand(),
+          decoration: BoxDecoration(
+              color: AppColors.blackBackGround,
+              borderRadius: const BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30)),
+              border: Border.all(color: AppColors.yellowPrimary)
+
+          ),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  controller: _scrollController,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      TitleCircle(text: FlutterI18n.translate(context, "date_and_hours")),
-                      //Header
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          IconButton(
-                            icon: const Icon(Icons.arrow_back_ios, color: AppColors.greyText),
-                            onPressed: () {
-                              setState(() {
-                                if (DateTime.now().month != _targetDateTime.month) {
-                                  _targetDateTime = DateTime(_targetDateTime.year, _targetDateTime.month - 1);
-                                  _currentMonth = DateFormat.MMMM("es_ES").format(_targetDateTime);
-                                  loadEvents(
-                                      DateTime(DateTime.now().year, _targetDateTime.month, 0).millisecondsSinceEpoch ~/ 1000,
-                                      DateTime(DateTime.now().year, _targetDateTime.month + 1, 1).millisecondsSinceEpoch ~/ 1000);
-                                  var month = DateTime(DateTime.now().year, _targetDateTime.month, 1);
-                                  setState(() {
-                                    heightCalendar = month.weekday >= 6 ? 340 : 290;
-                                  });
-                                }
-                              });
-                            },
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-                            child: StandardText(
-                              colorText: AppColors.whiteText,
-                              fontFamily: "Kanit_Regular",
-                              fontSize: 16,
-                              text: _currentMonth, align: TextAlign.start, lineHeight: 1,
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.arrow_forward_ios, color: AppColors.greyText),
-                            onPressed: () {
-                              setState(() {
-                                _targetDateTime = DateTime(_targetDateTime.year, _targetDateTime.month + 1);
-                                _currentMonth = DateFormat.MMMM("es_ES").format(_targetDateTime);
-                                loadEvents(
-                                    DateTime(DateTime.now().year, _targetDateTime.month, 0).millisecondsSinceEpoch ~/ 1000,
-                                    DateTime(DateTime.now().year, _targetDateTime.month + 1, 1).millisecondsSinceEpoch ~/ 1000);
-
-                                var month = DateTime(DateTime.now().year, _targetDateTime.month, 1);
-                                setState(() {
-                                  heightCalendar = month.weekday >= 6 ? 340 : 290;
-                                });
-                              });
-                            },
-                          ),
-                        ],
-                      ),
-                      Container(
-                        child: _calendarCarouselNoHeader,
-                      ),
-
-                      slotsSelected.length > 0
-                          ? GridView.count(
-                        physics: new NeverScrollableScrollPhysics(),
-                        childAspectRatio: 1.5,
-                        shrinkWrap: true,
-                        crossAxisCount: 4,
-                        children: List.generate(slotsSelected.length, (index) {
-                          return Center(
-                            child: SlotTimeRow(
-                              onPressed: (selected, position, String codeClosed) {
-                                setState(() {
-                                  if (codeClosed != null) {
-                                    showPhoneDialog();
-                                  } else {
-                                    for (int i = 0; i < slotsSelected.length; i++) {
-                                      slotsSelected[i].selected = false;
-                                    }
-                                    slotsSelected[position].selected = selected;
-                                    slotBooking = slotsSelected[position].timestamp;
-                                    maxSeatsLeft = slotsSelected[position].maxSeats != null ? slotsSelected[position].maxSeats : maxSeatsEvent;
-                                    minSeatsBuy = slotsSelected[position].minSeatsBuy != null ? slotsSelected[position].minSeatsBuy : minSeatsBuy;
-                                  }
-                                });
-                              },
-                              position: index,
-                              selected: slotsSelected[index].selected,
-                              name: slotsSelected[index].hour,
-                              status: slotsSelected[index].status,
-                              codeClosed: slotsSelected[index].codeClosed,
-                            ),
-                          );
-                        }),
-                      )
-                          : Padding(
-                        padding: const EdgeInsets.only(left: 16.0),
-                        child: StandardText(
-                          colorText: AppColors.whiteText,
-                          fontFamily: "Kanit_Regular",
-                          fontSize: 16,
-                          text: noSlotsDay,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      LegendCircle(color: AppColors.primaryRed, text: FlutterI18n.translate(context, "hour_closed")),
-                      LegendCircle(
-                          color: AppColors.greyDarkText, text: FlutterI18n.translate(context, "hour_no_available")),
-                      LegendCircle(color: AppColors.pinkPrimary, text: FlutterI18n.translate(context, "hour_consult")),
-                      LegendCircle(color: AppColors.whiteText, text: FlutterI18n.translate(context, "hour_available")),
-                      LegendCircle(
-                          color: AppColors.yellowPrimary, text: FlutterI18n.translate(context, "hour_selected")),
-                      const SizedBox(height: 30),
-                    ],
+              const SizedBox(height: 12),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back_ios, color: AppColors.greyText),
+                    onPressed: (){
+                      setState((){
+                        var last_day_date = DateTime(_targetDateTime.year, _targetDateTime.month, 0);
+                        _targetDateTime = DateTime(_targetDateTime.year, _targetDateTime.month - 1);
+                        _currentMonth = DateFormat.MMMM("es_ES").format(_targetDateTime).toUpperCase();
+                        String _startDate = "01/" + _targetDateTime.month.toString() + "/" + _targetDateTime.year.toString();
+                        String _endDate = last_day_date.day.toString() + "/" + _targetDateTime.month.toString() + "/" + _targetDateTime.year.toString();
+                        loadEvents(
+                            _startDate,
+                            _endDate
+                        );
+                        var month = DateTime(_targetDateTime.year, _targetDateTime.month, 1);
+                        setState(() {
+                          heightCalendar = _targetDateTime.weekday >= 6 ? 340 : 290;
+                        });
+                      });
+                    },
                   ),
-                ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+                    child: StandardText(
+                      colorText: AppColors.whiteText,
+                      fontFamily: AppTextStyles.escapeDetailCompanyBrandName.fontFamily!,
+                      fontSize: 16,
+                      text: _currentMonth.toUpperCase(),
+                      align: TextAlign.center,
+                      lineHeight: 1,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.arrow_forward_ios, color: AppColors.greyText),
+                    onPressed: (){
+                      setState((){
+                        var last_day_date = DateTime(_targetDateTime.year, _targetDateTime.month + 2, 0);
+                        _targetDateTime = DateTime(_targetDateTime.year, _targetDateTime.month + 1);
+                        // _currentMonth = DateFormat.MMMM("es_ES").format(_targetDateTime).toUpperCase();
+                        String _startDate = "01/" + _targetDateTime.month.toString() + "/" + _targetDateTime.year.toString();
+                        String _endDate = last_day_date.day.toString() + "/" + _targetDateTime.month.toString() + "/" + _targetDateTime.year.toString();
+                        loadEvents(
+                            _startDate,
+                            _endDate
+                        );
+                        var month = DateTime(_targetDateTime.year, _targetDateTime.month, 1);
+                        setState(() {
+                          heightCalendar = _targetDateTime.weekday >= 6 ? 340 : 290;
+                          _currentMonth = DateFormat.MMMM("es_ES").format(_targetDateTime).toUpperCase();
+                        });
+                      });
+                    },
+                  ),
+                ],
               ),
-              slotBooking != 0
-                  ? StandardButton(
-                  colorButton: AppColors.yellowPrimary,
-                  standardText: StandardText(
-                    text: FlutterI18n.translate(context, "next"),
-                    fontFamily: "Kanit_Medium",
-                    fontSize: 18,
-                    colorText: AppColors.white,
+              const SizedBox(height: 8),
+              _calendarCarouselNoHeader,
+              _timesRow,
+
+              // HORAS SELECCIONADAS
+              /*
+          Expanded(
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+
+                  slotsSelected.isNotEmpty
+                      ? GridView.count(
+                    physics: const NeverScrollableScrollPhysics(),
+                    childAspectRatio: 1.5,
+                    shrinkWrap: true,
+                    crossAxisCount: 4,
+                    children: List.generate(slotsSelected.length, (index) {
+                      return Center(
+                        child: SlotTimeRow(
+                          onPressed: (selected) {
+                            setState(() {
+                              for (int i = 0; i < slotsSelected.length; i++) {
+                                slotsSelected[i].selected = false;
+                              }
+                              slotsSelected[index].selected = selected;
+                            });
+                          },
+                          slot: slotsSelected[index],
+                        ),
+                      );
+                    }),
+                  ) : Padding(
+                    padding: const EdgeInsets.only(left: 16.0),
+                    child: StandardText(
+                      colorText: AppColors.whiteText,
+                      fontFamily: "Kanit_Regular",
+                      fontSize: 16,
+                      text: noSlotsDay, lineHeight: 1, align: TextAlign.center,
+                    ),
                   ),
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        CupertinoPageRoute(
-                            builder: (BuildContext context) => TicketsPage(
-                                escape: widget.escape, slotBooking: slotBooking, timezone:timezone, maxSeats: maxSeatsLeft, minSeatsBuy: minSeatsBuy)));
-                  })
-                  : StandardButton(
-                  colorButton: AppColors.primaryYellow30,
-                  standardText: StandardText(
-                    text: FlutterI18n.translate(context, "next"),
-                    fontFamily: "Kanit_Medium",
-                    fontSize: 18,
-                    colorText: AppColors.white,
-                  ),
-                  onPressed: () {}),
+                  const SizedBox(height: 10),
+                  LegendCircle(
+                      color: AppColors.primaryRed,
+                      text: FlutterI18n.translate(
+                          context, "hour_closed")),
+                  LegendCircle(
+                      color: AppColors.greyDarkText,
+                      text: FlutterI18n.translate(
+                          context, "hour_no_available")),
+                  LegendCircle(
+                      color: AppColors.pinkPrimary,
+                      text: FlutterI18n.translate(
+                          context, "hour_consult")),
+                  LegendCircle(
+                      color: AppColors.whiteText,
+                      text: FlutterI18n.translate(
+                          context, "hour_available")),
+                  LegendCircle(
+                      color: AppColors.yellowPrimary,
+                      text: FlutterI18n.translate(
+                          context, "hour_selected")),
+                  const SizedBox(height: 30),
+                ],
+              ),
+            ),
+          ),
+          slotBooking != 0
+              ? StandardButton(
+              colorButton: AppColors.yellowPrimary,
+              standardText: StandardText(
+                text: FlutterI18n.translate(context, "next"),
+                fontFamily: "Kanit_Medium",
+                fontSize: 18,
+                colorText: AppColors.white, align: TextAlign.center, lineHeight: 1,
+              ),
+              onPressed: () {
+                // TODO: HA PRESIONADO EL BOTÓN DE SIGUIENTE
+                /*
+                            Navigator.push(
+                                context,
+                                CupertinoPageRoute(
+                                    builder: (BuildContext context) =>
+                                        TicketsPage(
+                                            escape: widget.escape,
+                                            slotBooking: slotBooking,
+                                            timezone: timezone,
+                                            maxSeats: maxSeatsLeft,
+                                            minSeatsBuy: minSeatsBuy)));
+                             */
+              })
+              : StandardButton(
+              colorButton: AppColors.primaryYellow30,
+              standardText: StandardText(
+                text: FlutterI18n.translate(context, "next"),
+                fontFamily: "Kanit_Medium",
+                fontSize: 18,
+                colorText: AppColors.white, align: TextAlign.center, lineHeight: 1,
+              ),
+              onPressed: () {}),
+           */
             ],
           ),
-        ),
+        )
       );
-       */
+
+
     }));
   }
 
+  bool isSameDate(DateTime date1, DateTime date2){
+    if (date1.year == date2.year && date1.month == date2.month && date1.day == date2.day){
+      return true;
+    }
+    return false;
+  }
 
-  void checkSlots() async {
+
+  void checkSlots(DateTime selectedDate) async {
     setState(() {
       slotsSelected.clear();
     });
 
+    CalendarDay? dayFound;
+
+    if (visibleCalendar != null){
+      for (CalendarDay day in visibleCalendar!.days){
+        if (isSameDate(selectedDate, DateTime(day.year, day.month, day.day))){
+          dayFound = day;
+          break;
+        }
+      }
+
+      if (dayFound != null){
+        print("Events of the day (" + selectedDate.day.toString() + "-" + selectedDate.month.toString() + "-" + selectedDate.year.toString() + "):");
+        // Cargamos los slots disponibles en la row
+        for (CalendarSimpleEvent event in dayFound.events){
+          slotsSelected.add(SlotTime(false, event));
+          print(event.time + " ... ");
+        }
+
+
+      }else{
+        print("Day not found in calendar");
+      }
+
+    }else{
+      // Todo, poner mensaje de que no hay slots
+      print("Calendar is null");
+    }
+
+    setState((){});
+
+    // Cargar en slotsSelected los slots del dia en cuestión
+
+    /*
     slotBooking = 0;
-    noSlotsDay = slotsEvents.length > 0 ? FlutterI18n.translate(context, "no_slots_day") : "";
-    tz.initializeTimeZones();
-    final timeZoneSlot = tz.getLocation(timezone);
+    noSlotsDay = slotsEvents.isNotEmpty ? FlutterI18n.translate(context, "no_slots_day") : ""; // TODO: REVIEW ISEMPTY
+    // tz.initializeTimeZones();
+    // final timeZoneSlot = tz.getLocation(timezone);
     for (int i = 0; i < slotsEvents.length; i++) {
       var date = DateTime.fromMillisecondsSinceEpoch(slotsEvents[i].time * 1000);
       if (_currentDate2.day == date.day) {
         setState(() {
+          slotsSelected.add(SlotTime(false, CalendarSimpleEvent())); // TODO
           slotsSelected.add(SlotTuritop(false,
               timestamp: slotsEvents[i].time,
               hour: DateFormat("HH:mm").format(tz.TZDateTime.from(date, timeZoneSlot)),
@@ -457,6 +496,7 @@ class CalendarWidgetState extends State<CalendarWidget>{
 
     _scrollController.animateTo(_scrollController.position.maxScrollExtent,
         duration: const Duration(milliseconds: 500), curve: Curves.ease);
+     */
   }
 
   /*

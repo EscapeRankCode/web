@@ -14,4 +14,6 @@ class CalendarSimpleEvent{
       availability: json["availability"]
     );
   }
+
+
 }
