@@ -131,6 +131,14 @@ class CalendarWidgetState extends State<CalendarWidget>{
     print("Events called to be loaded!");
   }
 
+  void _selectTime(SlotTime slot){
+    // TODO: WHAT DO WE DO WHEN USER CLICS ON A TIME
+    //  -- SAVE:
+    //    -- DATE
+    //    -- TIME
+    //    -- SLOT INFO (SlotTime object)
+  }
+
   @override
   Widget build(BuildContext context) {
     /// Example Calendar Carousel without header and custom prev & next button
@@ -201,6 +209,7 @@ class CalendarWidgetState extends State<CalendarWidget>{
         setState(() {
           _targetDateTime = date;
           _currentMonth = DateFormat.MMMM("es_ES").format(_targetDateTime).toUpperCase();
+          // TODO: LOAD ANY TIME OR NOT? WHEN MONTH IS CHANGED
         });
       },
     );
@@ -212,10 +221,29 @@ class CalendarWidgetState extends State<CalendarWidget>{
         StandardText(
             fontSize: AppTextStyles.escapeDetailCompanyBrandName.fontSize!,
             text: "Sesiones el día " + DateFormat('dd/MM/yyyy').format(_currentDate2),
-            fontFamily: AppTextStyles.escapeDetailCompanyBrandName.fontFamily!,
+            fontFamily: AppTextStyles.escapeDetailRatingAndCity.fontFamily!,
             colorText: AppColors.yellowPrimary,
-            align: TextAlign.start, lineHeight: 1
-        )
+            align: TextAlign.center, lineHeight: 1
+        ),
+        const SizedBox(height: 8),
+
+        // If there are times now we show times, if not we show a message
+        slotsSelected.isEmpty ?
+          const Text("Slots is empty") : // Text = NO HAY HORAS
+          Wrap( // LISTA DE HORAS
+            direction: Axis.horizontal,
+            spacing: 10,
+            runSpacing: 12,
+            alignment: WrapAlignment.center,
+            children: List.generate(slotsSelected.length, (index){
+              return SlotTimeRow(
+                slot: slotsSelected[index],
+                onPressed: (pressed) {
+                  _selectTime(slotsSelected[index]);
+                },
+              );
+            }),
+          )
       ],
     );
 
