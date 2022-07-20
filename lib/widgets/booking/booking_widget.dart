@@ -209,42 +209,63 @@ class CalendarWidgetState extends State<CalendarWidget>{
         setState(() {
           _targetDateTime = date;
           _currentMonth = DateFormat.MMMM("es_ES").format(_targetDateTime).toUpperCase();
-          // TODO: LOAD ANY TIME OR NOT? WHEN MONTH IS CHANGED
+          // now we load the next month 1st events
+          _currentDate2 = DateTime(date.year, date.month, 1);
+          DateTime date1 = DateTime(date.year, date.month, 1);
+          DateTime date2 = DateTime(date.year, date.month + 1, 0);
+
+          loadEvents(
+            DateFormat('dd/MM/yyyy').format(date1),
+            DateFormat('dd/MM/yyyy').format(date2)
+          );
+          // checkSlots(_currentDate2);
         });
       },
     );
     
-    final _timesRow = Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        StandardText(
-            fontSize: AppTextStyles.escapeDetailCompanyBrandName.fontSize!,
-            text: "Sesiones el día " + DateFormat('dd/MM/yyyy').format(_currentDate2),
-            fontFamily: AppTextStyles.escapeDetailRatingAndCity.fontFamily!,
-            colorText: AppColors.yellowPrimary,
-            align: TextAlign.center, lineHeight: 1
-        ),
-        const SizedBox(height: 8),
+    final _timesRow = Align(
+      alignment: Alignment.topLeft,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            StandardText( // FlutterI18n.translate(context, "times_title"),
+                fontSize: AppTextStyles.bookingTimesRowTitle.fontSize!,
+                text: FlutterI18n.translate(context, "times_title") + DateFormat('dd/MM/yyyy').format(_currentDate2),
+                fontFamily: AppTextStyles.bookingTimesRowTitle.fontFamily!,
+                colorText: AppTextStyles.bookingTimesRowTitle.color!,
+                align: TextAlign.start, lineHeight: 1
+            ),
+            const SizedBox(height: 8),
 
-        // If there are times now we show times, if not we show a message
-        slotsSelected.isEmpty ?
-          const Text("Slots is empty") : // Text = NO HAY HORAS
-          Wrap( // LISTA DE HORAS
-            direction: Axis.horizontal,
-            spacing: 10,
-            runSpacing: 12,
-            alignment: WrapAlignment.center,
-            children: List.generate(slotsSelected.length, (index){
-              return SlotTimeRow(
-                slot: slotsSelected[index],
-                onPressed: (pressed) {
-                  _selectTime(slotsSelected[index]);
-                },
-              );
-            }),
-          )
-      ],
+            // If there are times now we show times, if not we show a message
+            slotsSelected.isEmpty ?
+            StandardText(
+                fontSize: AppTextStyles.bookingTimesRowEmpty.fontSize!,
+                text: FlutterI18n.translate(context, "times_empty"),
+                fontFamily: AppTextStyles.bookingTimesRowEmpty.fontFamily!,
+                colorText: AppTextStyles.bookingTimesRowEmpty.color!,
+                align: TextAlign.start, lineHeight: 1.5
+            ) : // Text = NO HAY HORAS
+            Wrap( // LISTA DE HORAS
+              direction: Axis.horizontal,
+              spacing: 10,
+              runSpacing: 12,
+              alignment: WrapAlignment.start,
+              children: List.generate(slotsSelected.length, (index){
+                return SlotTimeRow(
+                  slot: slotsSelected[index],
+                  onPressed: (pressed) {
+                    _selectTime(slotsSelected[index]);
+                  },
+                );
+              }),
+            )
+          ],
+        ),
+      ),
     );
 
 
@@ -265,8 +286,10 @@ class CalendarWidgetState extends State<CalendarWidget>{
         print("Calendar Loaded Success state");
 
         // maxSeatsEvent = state.product.data.maxSeatsBuy;
-        // checkSlots(); TODO: MAYBE NECESSARY
-        setState((){});
+        // checkSlots(_currentDate);
+        setState((){
+          checkSlots(_currentDate2);
+        });
       }
 
       if (state is CalendarLoadedFailure) {

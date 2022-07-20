@@ -284,5 +284,7 @@
   "available_points" : "Puntos disponibles",
   "reviews" : " valoraciones",
   "filters_name_section_title": "Nombre y localización",
-  "filters_name_section_filters": "Filtros"
+  "filters_name_section_filters": "Filtros",
+  "times_title": "Sesiones el día ",
+  "times_empty": "No hay horas disponibles para el día seleccionado"
 }

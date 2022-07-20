@@ -145,4 +145,19 @@ class AppTextStyles{
     fontFamily: "Montserrat_Regular"
   );
 
+
+  // BOOKING
+  static const TextStyle bookingTimesRowTitle = TextStyle(
+      color: AppColors.whiteText,
+      fontSize: 15,
+      fontWeight: FontWeight.bold,
+      fontFamily: "Montserrat_Bold"
+  );
+  static const TextStyle bookingTimesRowEmpty = TextStyle(
+      color: AppColors.yellowPrimary,
+      fontSize: 14,
+      fontWeight: FontWeight.normal,
+      fontFamily: "Montserrat_Regular"
+  );
+
 }
