@@ -285,8 +285,6 @@ class CalendarWidgetState extends State<CalendarWidget>{
         // slotsEvents = state.calendarAvailability.data.calendar.days[0].events; // TODO: #Invented
         print("Calendar Loaded Success state");
 
-        // maxSeatsEvent = state.product.data.maxSeatsBuy;
-        // checkSlots(_currentDate);
         setState((){
           checkSlots(_currentDate2);
         });
