@@ -69,4 +69,5 @@ class Responses {
 
 class BookingsLayerApi{
   static const getCalendarAvailability = '/api/bookings_layer/calendar_availability';
+  static const getEventTickets = '/api/bookings_layer/event_tickets';
 }

@@ -1,6 +1,6 @@
 
 
-import 'package:flutter_escaperank_web/models/bookings_layer/calendar_day.dart';
+import 'package:flutter_escaperank_web/models/bookings_layer/calendar/calendar_day.dart';
 
 class CalendarGeneral{
   final String timezone;

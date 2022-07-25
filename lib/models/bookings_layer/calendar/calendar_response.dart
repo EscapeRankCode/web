@@ -1,7 +1,7 @@
 
 
 
-import 'package:flutter_escaperank_web/models/bookings_layer/calendar_data.dart';
+import 'package:flutter_escaperank_web/models/bookings_layer/calendar/calendar_data.dart';
 
 class CalendarResponse{
   final String? status;

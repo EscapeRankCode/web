@@ -1,6 +1,6 @@
 
 
-import 'package:flutter_escaperank_web/models/bookings_layer/calendar_general.dart';
+import 'package:flutter_escaperank_web/models/bookings_layer/calendar/calendar_general.dart';
 
 class CalendarData{
   final int booking_system_id;

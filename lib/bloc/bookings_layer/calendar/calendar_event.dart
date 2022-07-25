@@ -1,5 +1,3 @@
-
-
 import 'package:equatable/equatable.dart';
 
 abstract class CalendarEvent extends Equatable{
@@ -7,7 +5,6 @@ abstract class CalendarEvent extends Equatable{
   List<Object> get props => [];
 }
 
-// Similar to GetProductEvents in app version
 class GetCalendar extends CalendarEvent{
   String? token;
   final int escape_id;
@@ -16,3 +13,15 @@ class GetCalendar extends CalendarEvent{
 
   GetCalendar({this.token, required this.escape_id, required this.start_date, required this.end_date});
 }
+
+class GetTickets extends CalendarEvent{
+  String? token;
+  final String event_date;
+  final String event_time;
+  final int booking_system_id;
+  final int bs_config;
+  final String event_id;
+
+  GetTickets({this.token, required this.event_date, required this.event_time, required this.booking_system_id, required this.bs_config, required this.event_id});
+}
+

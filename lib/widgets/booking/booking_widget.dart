@@ -5,9 +5,9 @@ import 'package:flutter_calendar_carousel/classes/event.dart';
 import 'package:flutter_escaperank_web/bloc/bookings_layer/calendar/calendar_bloc.dart';
 import 'package:flutter_escaperank_web/bloc/bookings_layer/calendar/calendar_event.dart';
 import 'package:flutter_escaperank_web/bloc/bookings_layer/calendar/calendar_state.dart';
-import 'package:flutter_escaperank_web/models/bookings_layer/calendar_day.dart';
-import 'package:flutter_escaperank_web/models/bookings_layer/calendar_general.dart';
-import 'package:flutter_escaperank_web/models/bookings_layer/calendar_simple_event.dart';
+import 'package:flutter_escaperank_web/models/bookings_layer/calendar/calendar_day.dart';
+import 'package:flutter_escaperank_web/models/bookings_layer/calendar/calendar_general.dart';
+import 'package:flutter_escaperank_web/models/bookings_layer/calendar/calendar_simple_event.dart';
 import 'package:flutter_escaperank_web/models/escape_room.dart';
 import 'package:flutter_escaperank_web/services/calendar_service.dart';
 import 'package:flutter_escaperank_web/utils/app_colors.dart';
@@ -128,10 +128,18 @@ class CalendarWidgetState extends State<CalendarWidget>{
         start_date: startDate,
         end_date: endDate
     ));
-    print("Events called to be loaded!");
   }
 
   void _selectTime(SlotTime slot){
+    _calendarBloc.add(
+      GetTickets(
+        event_date: DateFormat('dd/MM/yyyy').format(_currentDate2),
+        event_time: slot.event.time,
+        booking_system_id: ,
+        bs_config: bs_config,
+        event_id: event_id
+      )
+    );
     // TODO: WHAT DO WE DO WHEN USER CLICS ON A TIME
     //  -- SAVE:
     //    -- DATE

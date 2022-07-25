@@ -19,6 +19,9 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState>{
     if (event is GetCalendar){
       yield* _mapGetCalendarToState(event);
     }
+    if (event is GetTickets){
+      yield* _mapGetTicketsToState(event);
+    }
 
     yield CalendarLoadedFailure(error: "error_get_calendar");
   }
@@ -29,23 +32,38 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState>{
     try{
       var calendar = await _calendarService.getCalendar(event.escape_id, event.start_date, event.end_date);
 
-      print("CALENDAR FROM JSON IS:");
-      print(calendar);
-
-
       if (calendar != null){
-        print("Calendar is not null");
         yield CalendarLoadedSuccess(calendarAvailability: calendar);
 
       }else{
-        print("Calendar is null");
         yield CalendarLoadedFailure(error: "error_get_calendar");
       }
 
     } catch(err){
-      print("Exception!");
       yield CalendarLoadedFailure(error: "error_get_calendar");
     }
     
   }
+
+  Stream<CalendarState> _mapGetTicketsToState(GetTickets event) async*{
+
+    yield CalendarEventTicketsLoading();
+
+    try{
+
+      var event_tickets = await _calendarService.getEventTickets(event.event_date, event.event_time, event.booking_system_id, event.bs_config, event.event_id);
+
+      if (event_tickets != null){
+        yield CalendarEventTicketsLoadedSuccess(eventTickets: event_tickets);
+
+      }else{
+        yield CalendarEventTicketsLoadedFailure(error: "error_get_tickets");
+      }
+
+    }catch(err){
+      yield CalendarEventTicketsLoadedFailure(error: "error_get_tickets");
+    }
+
+  }
+
 }

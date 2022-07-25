@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_escaperank_web/models/bookings_layer/calendar_simple_event.dart';
+import 'package:flutter_escaperank_web/models/bookings_layer/calendar/calendar_simple_event.dart';
 import 'package:flutter_escaperank_web/utils/app_colors.dart';
 import 'package:flutter_escaperank_web/utils/bookings_layer_utils.dart';
 import 'package:flutter_escaperank_web/widgets/text/standard_text.dart';

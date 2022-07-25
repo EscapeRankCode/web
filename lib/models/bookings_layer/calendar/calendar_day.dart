@@ -1,6 +1,6 @@
 
 
-import 'package:flutter_escaperank_web/models/bookings_layer/calendar_simple_event.dart';
+import 'package:flutter_escaperank_web/models/bookings_layer/calendar/calendar_simple_event.dart';
 
 class CalendarDay{
   final int year;
