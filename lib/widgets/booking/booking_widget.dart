@@ -96,6 +96,8 @@ class CalendarWidgetState extends State<CalendarWidget>{
   List<SlotTime> slotsSelected = [];
   CalendarSimpleEvent? selectedEvent;
 
+  int _phase = 1;
+
   
   @override
   void initState() {
@@ -135,9 +137,9 @@ class CalendarWidgetState extends State<CalendarWidget>{
       GetTickets(
         event_date: DateFormat('dd/MM/yyyy').format(_currentDate2),
         event_time: slot.event.time,
-        booking_system_id: ,
-        bs_config: bs_config,
-        event_id: event_id
+        booking_system_id: widget.escapeRoom.bookingSystemId!,
+        bs_config: widget.escapeRoom.bsConfigId!,
+        event_id: slot.event.eventId
       )
     );
     // TODO: WHAT DO WE DO WHEN USER CLICS ON A TIME
@@ -149,6 +151,7 @@ class CalendarWidgetState extends State<CalendarWidget>{
 
   @override
   Widget build(BuildContext context) {
+
     /// Example Calendar Carousel without header and custom prev & next button
     final _calendarCarouselNoHeader = CalendarCarousel<Event>(
 
@@ -266,6 +269,7 @@ class CalendarWidgetState extends State<CalendarWidget>{
                 return SlotTimeRow(
                   slot: slotsSelected[index],
                   onPressed: (pressed) {
+                    // TODO: JUMP TO PHASE X TO LOAD
                     _selectTime(slotsSelected[index]);
                   },
                 );
@@ -277,10 +281,89 @@ class CalendarWidgetState extends State<CalendarWidget>{
     );
 
 
+    // PHASES WIDGETS
+    // PHASE 0 (LOADING CALENDAR)
+    var _booking_phase_0 = Text("PHASE 0");
+    // PHASE 1 (SELECT DAY AND TIME)
+    var _booking_phase_1 = Column(
+      children: [
+        const SizedBox(height: 12),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.arrow_back_ios, color: AppColors.greyText),
+              onPressed: (){
+                setState((){
+                  var last_day_date = DateTime(_targetDateTime.year, _targetDateTime.month, 0);
+                  _targetDateTime = DateTime(_targetDateTime.year, _targetDateTime.month - 1);
+                  _currentMonth = DateFormat.MMMM("es_ES").format(_targetDateTime).toUpperCase();
+                  String _startDate = "01/" + _targetDateTime.month.toString() + "/" + _targetDateTime.year.toString();
+                  String _endDate = last_day_date.day.toString() + "/" + _targetDateTime.month.toString() + "/" + _targetDateTime.year.toString();
+                  loadEvents(
+                      _startDate,
+                      _endDate
+                  );
+                  var month = DateTime(_targetDateTime.year, _targetDateTime.month, 1);
+                  setState(() {
+                    heightCalendar = _targetDateTime.weekday >= 6 ? 340 : 290;
+                  });
+                });
+              },
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+              child: StandardText(
+                colorText: AppColors.whiteText,
+                fontFamily: AppTextStyles.escapeDetailCompanyBrandName.fontFamily!,
+                fontSize: 16,
+                text: _currentMonth.toUpperCase(),
+                align: TextAlign.center,
+                lineHeight: 1,
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.arrow_forward_ios, color: AppColors.greyText),
+              onPressed: (){
+                setState((){
+                  var last_day_date = DateTime(_targetDateTime.year, _targetDateTime.month + 2, 0);
+                  _targetDateTime = DateTime(_targetDateTime.year, _targetDateTime.month + 1);
+                  // _currentMonth = DateFormat.MMMM("es_ES").format(_targetDateTime).toUpperCase();
+                  String _startDate = "01/" + _targetDateTime.month.toString() + "/" + _targetDateTime.year.toString();
+                  String _endDate = last_day_date.day.toString() + "/" + _targetDateTime.month.toString() + "/" + _targetDateTime.year.toString();
+                  loadEvents(
+                      _startDate,
+                      _endDate
+                  );
+                  var month = DateTime(_targetDateTime.year, _targetDateTime.month, 1);
+                  setState(() {
+                    heightCalendar = _targetDateTime.weekday >= 6 ? 340 : 290;
+                    _currentMonth = DateFormat.MMMM("es_ES").format(_targetDateTime).toUpperCase();
+                  });
+                });
+              },
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        _calendarCarouselNoHeader,
+        _timesRow,
+      ],
+    );
+    // PHASE 2 (SELECT TICKET)
+    var _booking_phase_2 = Text("PHASE 2");
+
+
+
+
     return BlocListener<CalendarBloc, CalendarState>(listener: (context, state) {
 
       if (state is CalendarLoading){
         print("Calendar Loading state");
+        setState((){
+          _phase = 0; // Calendar is loading TODO: LOADING WIDGET
+        });
       }
 
       if (state is CalendarLoadedSuccess) {
@@ -294,12 +377,30 @@ class CalendarWidgetState extends State<CalendarWidget>{
         print("Calendar Loaded Success state");
 
         setState((){
+          _phase = 1; // Calendar has been loaded
           checkSlots(_currentDate2);
         });
       }
 
       if (state is CalendarLoadedFailure) {
+        setState((){
+          // _phase = 0; // Calendar error: TODO: how do we know what to show
+        });
         print("Calendar Loading Failure state");
+      }
+
+      if (state is CalendarEventTicketsLoading){
+        print("Event Tickets Loading state");
+        setState((){
+          // _phase = 0; // Event Tickets are loading TODO: LOADING WIDGET
+        });
+      }
+
+      if (state is CalendarEventTicketsLoadedSuccess){
+        print("Event Tickets Loaded Successfully");
+        setState((){
+          _phase = 2;
+        });
       }
 
     } , child: BlocBuilder<CalendarBloc, CalendarState>(builder: (context, state) {
@@ -312,6 +413,7 @@ class CalendarWidgetState extends State<CalendarWidget>{
               border: Border.all(color: AppColors.yellowPrimary)
 
           ),
+          /*
           child: Column(
             children: [
               const SizedBox(height: 12),
@@ -478,12 +580,17 @@ class CalendarWidgetState extends State<CalendarWidget>{
            */
             ],
           ),
+           */
+          child: _phase == 0 ? _booking_phase_0 :
+          _phase == 1 ? _booking_phase_1 :
+          _phase == 2 ? _booking_phase_2 : Text("Phase X"),
         )
       );
 
 
     }));
   }
+
 
   bool isSameDate(DateTime date1, DateTime date2){
     if (date1.year == date2.year && date1.month == date2.month && date1.day == date2.day){
