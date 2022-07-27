@@ -56,24 +56,26 @@ class _SlotTimeRowState extends State<SlotTimeRow> {
       }
     }
     initStatus();
-    return GestureDetector(
-      onTap: () {
-        if(enabled) {
-          widget.onPressed(!widget.slot.selected);
-        }
-      },
-      child: Container(
-          decoration: BoxDecoration(
-              color: Colors.transparent,
-              border: Border.all(
-                  color: widget.slot.selected
-                      ? widget.slot.event.availability == BookingsLayerUtils.EVENT_AVAILABILITY_FREE ? AppColors.yellowPrimary : color
-                      : color),
-              borderRadius: BorderRadius.circular(10)),
-          padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-          child:
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () {
+          if(enabled) {
+            widget.onPressed(!widget.slot.selected);
+          }
+        },
+        child: Container(
+            decoration: BoxDecoration(
+                color: Colors.transparent,
+                border: Border.all(
+                    color: widget.slot.selected
+                        ? widget.slot.event.availability == BookingsLayerUtils.EVENT_AVAILABILITY_FREE ? AppColors.yellowPrimary : color
+                        : color),
+                borderRadius: BorderRadius.circular(10)),
+            padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+            child:
 
-          StandardText(
+            StandardText(
               fontSize: 13,
               text: widget.slot.event.time,
               fontFamily: "Kanit_Regular",
@@ -81,6 +83,7 @@ class _SlotTimeRowState extends State<SlotTimeRow> {
                   ? AppColors.yellowPrimary
                   : color,
               align: TextAlign.center, lineHeight: 1,)),
+      ),
     );
   }
 }
