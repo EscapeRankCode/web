@@ -160,4 +160,11 @@ class AppTextStyles{
       fontFamily: "Montserrat_Regular"
   );
 
+  static const TextStyle bookingTicket = TextStyle(
+      color: AppColors.whiteText,
+      fontSize: 14,
+      fontWeight: FontWeight.normal,
+      fontFamily: "Montserrat_Regular"
+  );
+
 }

@@ -12,7 +12,7 @@ import 'package:flutter_escaperank_web/models/escape_room.dart';
 import 'package:flutter_escaperank_web/services/calendar_service.dart';
 import 'package:flutter_escaperank_web/utils/app_colors.dart';
 import 'package:flutter_escaperank_web/utils/app_text_styles.dart';
-import 'package:flutter_escaperank_web/widgets/buttons/slot_time_row.dart';
+import 'package:flutter_escaperank_web/widgets/booking/slot_time_row.dart';
 import 'package:flutter_escaperank_web/widgets/buttons/standard_button.dart';
 import 'package:flutter_escaperank_web/widgets/text/legend_circle.dart';
 import 'package:flutter_escaperank_web/widgets/text/standard_text.dart';
