@@ -8,6 +8,8 @@ import 'package:flutter_escaperank_web/bloc/bookings_layer/calendar/calendar_sta
 import 'package:flutter_escaperank_web/models/bookings_layer/calendar/calendar_day.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/calendar/calendar_general.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/calendar/calendar_simple_event.dart';
+import 'package:flutter_escaperank_web/models/bookings_layer/tickets/ticket.dart';
+import 'package:flutter_escaperank_web/models/bookings_layer/tickets/tickets_group.dart';
 import 'package:flutter_escaperank_web/models/escape_room.dart';
 import 'package:flutter_escaperank_web/services/calendar_service.dart';
 import 'package:flutter_escaperank_web/utils/app_colors.dart';
@@ -95,6 +97,8 @@ class CalendarWidgetState extends State<CalendarWidget>{
   late String timezone;
   List<SlotTime> slotsSelected = [];
   CalendarSimpleEvent? selectedEvent;
+  List<TicketsGroup>? eventTicketsGroups;
+  List<Ticket>? eventTickets;
 
   int _phase = 1;
 
@@ -280,6 +284,8 @@ class CalendarWidgetState extends State<CalendarWidget>{
       ),
     );
 
+    final _ticketsColumn = List.generate(wi, (index) => null)
+
 
     // PHASES WIDGETS
     // PHASE 0 (LOADING CALENDAR)
@@ -352,7 +358,12 @@ class CalendarWidgetState extends State<CalendarWidget>{
       ],
     );
     // PHASE 2 (SELECT TICKET)
-    var _booking_phase_2 = Text("PHASE 2");
+    var _booking_phase_2 = Column(
+      children: [
+        const SizedBox(height: 12),
+
+      ],
+    );
 
 
 
@@ -398,6 +409,7 @@ class CalendarWidgetState extends State<CalendarWidget>{
 
       if (state is CalendarEventTicketsLoadedSuccess){
         print("Event Tickets Loaded Successfully");
+        eventTicketsGroups = state.eventTickets.data.tickets_groups;
         setState((){
           _phase = 2;
         });

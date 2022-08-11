@@ -3,8 +3,6 @@ import 'dart:html';
 import 'package:flutter/material.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/tickets/ticket_info.dart';
 import 'package:flutter_escaperank_web/utils/app_colors.dart';
-import 'package:flutter_escaperank_web/utils/app_text_styles.dart';
-import 'package:flutter_escaperank_web/widgets/text/standard_text.dart';
 
 class TicketOptionData{
   final String ticket_name;
@@ -16,15 +14,13 @@ class TicketOptionData{
 
 class TicketOption extends StatefulWidget {
   TicketOptionData ticket;
-  Object radioGroup;
 
   void Function(bool) onPressed;
 
   TicketOption(
       {Key? key,
         required this.onPressed,
-        required this.ticket,
-        required this.radioGroup
+        required this.ticket
       }
       ) : super(key: key);
 
@@ -47,9 +43,14 @@ class _TicketOptionState extends State<TicketOption> {
   @override
   Widget build(BuildContext context) {
 
-    return const MouseRegion(
+    return MouseRegion(
       cursor: SystemMouseCursors.click,
-      child: Text("WIDGET COMO EL RADIO LIST TILE, PERO PROPIO :/")
+      child: GestureDetector(
+        child: Text(widget.ticket.ticket_name),
+        onTap: (){
+          print("Ticket '" + widget.ticket.ticket_name + "' clicked");
+        },
+      )// Text("WIDGET COMO EL RADIO LIST TILE, PERO PROPIO :/")
       /*
       ListTile(
         title: StandardText(
