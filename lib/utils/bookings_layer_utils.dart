@@ -11,4 +11,8 @@ class BookingsLayerUtils{
   static int get DAY_AVAILABILITY_MIXED => 2;
   static int get DAY_AVAILABILITY_FREE => 3;
 
+  static const int TICKET_TYPE_OPTION = 1;
+  static const int TICKET_TYPE_CHECK = 2;
+  static const int TICKET_TYPE_COUNTER = 3;
+
 }

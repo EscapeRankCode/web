@@ -1,11 +1,13 @@
 import 'package:flutter_escaperank_web/models/bookings_layer/tickets/ticket.dart';
+import 'package:flutter_escaperank_web/models/bookings_layer/tickets/tickets_selection.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/tickets/total_rules.dart';
 
 class TicketsGroup{
   final List<Ticket> tickets;
   final TotalRules total_rules;
+  TicketsSelection tickets_selection;
 
-  TicketsGroup({required this.tickets, required this.total_rules});
+  TicketsGroup({required this.tickets, required this.total_rules, required this.tickets_selection});
 
   factory TicketsGroup.fromJson(Map<String, dynamic> json){
 
@@ -19,7 +21,8 @@ class TicketsGroup{
 
     return TicketsGroup(
       tickets: ticketsList,
-      total_rules: totalRulesFromJson
+      total_rules: totalRulesFromJson,
+      tickets_selection: TicketsSelection()
     );
 
   }

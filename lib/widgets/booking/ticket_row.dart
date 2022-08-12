@@ -49,6 +49,7 @@ class _TicketOptionState extends State<TicketOption> {
         child: Text(widget.ticket.ticket_name),
         onTap: (){
           print("Ticket '" + widget.ticket.ticket_name + "' clicked");
+          selected = !selected;
         },
       )// Text("WIDGET COMO EL RADIO LIST TILE, PERO PROPIO :/")
       /*

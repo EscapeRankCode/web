@@ -15,6 +15,7 @@ import 'package:flutter_escaperank_web/services/calendar_service.dart';
 import 'package:flutter_escaperank_web/utils/app_colors.dart';
 import 'package:flutter_escaperank_web/utils/app_text_styles.dart';
 import 'package:flutter_escaperank_web/widgets/booking/slot_time_row.dart';
+import 'package:flutter_escaperank_web/widgets/booking/tickets_group_widget.dart';
 import 'package:flutter_escaperank_web/widgets/buttons/standard_button.dart';
 import 'package:flutter_escaperank_web/widgets/text/legend_circle.dart';
 import 'package:flutter_escaperank_web/widgets/text/standard_text.dart';
@@ -284,8 +285,6 @@ class CalendarWidgetState extends State<CalendarWidget>{
       ),
     );
 
-    final _ticketsColumn = List.generate(wi, (index) => null)
-
 
     // PHASES WIDGETS
     // PHASE 0 (LOADING CALENDAR)
@@ -361,7 +360,21 @@ class CalendarWidgetState extends State<CalendarWidget>{
     var _booking_phase_2 = Column(
       children: [
         const SizedBox(height: 12),
+        eventTicketsGroups == null ?
 
+          Text("Error, tickets not found!") : // TODO: When error
+
+          ListView.builder(
+            itemCount: eventTicketsGroups!.length,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 6
+                ),
+                child: TicketsGroupWidget(eventTicketsGroups![index]),
+              );
+            }
+          )
       ],
     );
 
