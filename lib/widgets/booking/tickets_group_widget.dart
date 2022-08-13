@@ -26,15 +26,15 @@ class TicketsGroupWidget extends StatelessWidget{
             Ticket ticket = ticketsGroup.tickets[index];
 
             switch (ticket.ticket_type){
-              case BookingsLayerUtils.TICKET_TYPE_CHECK: {
+              case Ticket.CHECK: {
                 return Text("Ticket check " + index.toString());
               }break;
 
-              case BookingsLayerUtils.TICKET_TYPE_COUNTER: {
+              case Ticket.COUNTER: {
                 return Text("Ticket counter " + index.toString());
               }break;
 
-              case BookingsLayerUtils.TICKET_TYPE_OPTION: {
+              case Ticket.OPTION: {
                 TicketInfoOption ticketInfoOption = ticket.ticket_info as TicketInfoOption;
 
                 return TicketOption(
