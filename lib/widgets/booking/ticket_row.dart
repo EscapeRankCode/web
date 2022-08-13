@@ -3,6 +3,8 @@ import 'dart:html';
 import 'package:flutter/material.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/tickets/ticket_info.dart';
 import 'package:flutter_escaperank_web/utils/app_colors.dart';
+import 'package:flutter_escaperank_web/utils/app_text_styles.dart';
+import 'package:flutter_escaperank_web/widgets/text/standard_text.dart';
 
 class TicketOptionData{
   final String ticket_name;
@@ -15,7 +17,7 @@ class TicketOptionData{
 class TicketOption extends StatefulWidget {
   TicketOptionData ticket;
 
-  void Function(bool) onPressed;
+  bool Function(bool) onPressed;
 
   TicketOption(
       {Key? key,
@@ -46,28 +48,37 @@ class _TicketOptionState extends State<TicketOption> {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
-        child: Text(widget.ticket.ticket_name),
         onTap: (){
           print("Ticket '" + widget.ticket.ticket_name + "' clicked");
-          selected = !selected;
+          setState((){
+            bool new_selected = widget.onPressed(!selected);
+            selected = new_selected;
+          });
+
         },
-      )// Text("WIDGET COMO EL RADIO LIST TILE, PERO PROPIO :/")
-      /*
-      ListTile(
-        title: StandardText(
-          text: widget.ticket.ticket_name,
-          colorText: AppTextStyles.bookingTicket.color!,
-          fontSize: AppTextStyles.bookingTicket.fontSize!,
-          fontFamily: AppTextStyles.bookingTicket.fontFamily!,
-          lineHeight: 1,
-          align: TextAlign.start,
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+          child: Container(
+            decoration: BoxDecoration(
+                color: selected ? AppColors.yellowPrimary : AppColors.blackBackGround,
+                borderRadius: const BorderRadius.all(Radius.circular(6)),
+                border: Border.all(color: selected ? AppColors.yellowPrimary : AppColors.greyDark)
+            ),
+            child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: StandardText(
+                  colorText: AppTextStyles.bookingTicket.color!,
+                  text: widget.ticket.ticket_name,
+                  fontSize: AppTextStyles.bookingTicket.fontSize!,
+                  fontFamily: AppTextStyles.bookingTicket.fontFamily!,
+                  lineHeight: 1,
+                  align: TextAlign.center,
+                )
+              // Text(widget.ticket.ticket_name),
+            ),
+          ),
         ),
-        onTap: (){
-          selected = !selected;
-          widget.onPressed(selected);
-        },
-      )
-       */
+      ),
     );
   }
 }

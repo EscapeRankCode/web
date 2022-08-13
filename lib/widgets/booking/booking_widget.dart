@@ -454,7 +454,7 @@ class CalendarWidgetState extends State<CalendarWidget>{
         child: Container(
           decoration: BoxDecoration(
               color: AppColors.blackBackGround,
-              borderRadius: const BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30)),
+              borderRadius: const BorderRadius.all(Radius.circular(30)), // .only(topLeft: Radius.circular(30), topRight: Radius.circular(30)),
               border: Border.all(color: AppColors.yellowPrimary)
 
           ),

@@ -44,17 +44,23 @@ class TicketsGroupWidget extends StatelessWidget{
 
                     if (pressed){
                       new_option_units = ticketsGroup.tickets_selection.option_selected_units + ticketInfoOption.single_unit_value;
-
                     }else{
                       new_option_units = ticketsGroup.tickets_selection.option_selected_units - ticketInfoOption.single_unit_value;
-
                     }
 
-                    if (new_option_units > ticketsGroup.total_rules.option_max_units || new_option_units < ticketsGroup.total_rules.option_min_units){
+                    print("Max Units = " + ticketsGroup.total_rules.option_max_units.toString());
+                    print("Min Units = " + ticketsGroup.total_rules.option_min_units.toString());
+                    print("New Option Units = " + new_option_units.toString());
+
+                    if (new_option_units > ticketsGroup.total_rules.option_max_units){
                       // TODO: SHOW ERROR
+                      print("Error in new option units");
+                      return !pressed;
                     }
                     else{
                       ticketsGroup.tickets_selection.option_selected_units = new_option_units;
+                      print("All OK new option units");
+                      return pressed;
                     }
 
                   },
