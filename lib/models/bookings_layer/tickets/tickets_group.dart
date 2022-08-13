@@ -10,6 +10,7 @@ class TicketsGroup{
   TicketsGroup({required this.tickets, required this.total_rules, required this.tickets_selection});
 
   factory TicketsGroup.fromJson(Map<String, dynamic> json){
+    print("Json response (TicketsGroup): " + json.toString());
 
     List<Ticket> ticketsList = [];
     if(json["tickets"] != null) {

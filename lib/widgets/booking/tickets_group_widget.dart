@@ -15,56 +15,60 @@ class TicketsGroupWidget extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 500,
 
-      child: ListView.builder(
-        itemCount: ticketsGroup.tickets.length,
-        itemBuilder: (context, index) {
+      child: SingleChildScrollView(
+        child: ListView.builder(
+          itemCount: ticketsGroup.tickets.length,
+          shrinkWrap: true,
+          itemBuilder: (context, index) {
 
-          Ticket ticket = ticketsGroup.tickets[index];
+            Ticket ticket = ticketsGroup.tickets[index];
 
-          switch (ticket.ticket_type){
-            case BookingsLayerUtils.TICKET_TYPE_CHECK: {
-              return Text("Ticket check " + index.toString());
-            }break;
+            switch (ticket.ticket_type){
+              case BookingsLayerUtils.TICKET_TYPE_CHECK: {
+                return Text("Ticket check " + index.toString());
+              }break;
 
-            case BookingsLayerUtils.TICKET_TYPE_COUNTER: {
-              return Text("Ticket counter " + index.toString());
-            }break;
+              case BookingsLayerUtils.TICKET_TYPE_COUNTER: {
+                return Text("Ticket counter " + index.toString());
+              }break;
 
-            case BookingsLayerUtils.TICKET_TYPE_OPTION: {
-              TicketInfoOption ticketInfoOption = ticket.ticket_info as TicketInfoOption;
+              case BookingsLayerUtils.TICKET_TYPE_OPTION: {
+                TicketInfoOption ticketInfoOption = ticket.ticket_info as TicketInfoOption;
 
-              return TicketOption(
+                return TicketOption(
 
-                onPressed: (pressed){
-                  int new_option_units = 0;
+                  onPressed: (pressed){
+                    int new_option_units = 0;
 
-                  if (pressed){
-                    new_option_units = ticketsGroup.tickets_selection.option_selected_units + ticketInfoOption.single_unit_value;
+                    if (pressed){
+                      new_option_units = ticketsGroup.tickets_selection.option_selected_units + ticketInfoOption.single_unit_value;
 
-                  }else{
-                    new_option_units = ticketsGroup.tickets_selection.option_selected_units - ticketInfoOption.single_unit_value;
+                    }else{
+                      new_option_units = ticketsGroup.tickets_selection.option_selected_units - ticketInfoOption.single_unit_value;
 
-                  }
+                    }
 
-                  if (new_option_units > ticketsGroup.total_rules.option_max_units || new_option_units < ticketsGroup.total_rules.option_min_units){
-                    // TODO: SHOW ERROR
-                  }
-                  else{
-                    ticketsGroup.tickets_selection.option_selected_units = new_option_units;
-                  }
+                    if (new_option_units > ticketsGroup.total_rules.option_max_units || new_option_units < ticketsGroup.total_rules.option_min_units){
+                      // TODO: SHOW ERROR
+                    }
+                    else{
+                      ticketsGroup.tickets_selection.option_selected_units = new_option_units;
+                    }
 
-                },
-                ticket: TicketOptionData(
-                  ticket.ticket_name,
-                  ticketInfoOption
-                ),
-              );
-            }break;
-          }
+                  },
+                  ticket: TicketOptionData(
+                      ticket.ticket_name,
+                      ticketInfoOption
+                  ),
+                );
+              }break;
+            }
 
-          return Text("Unknown ticket type");
-        },
+            return Text("Unknown ticket type");
+          },
+        ),
       ),
     );
 

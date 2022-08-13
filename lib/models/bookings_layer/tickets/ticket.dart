@@ -12,6 +12,7 @@ class Ticket{
   Ticket({required this.ticket_name, required this.ticket_type, required this.ticket_info});
 
   factory Ticket.fromJson(Map<String, dynamic> json){
+    print("Json response (Ticket): " + json.toString());
     TicketInfo? jsonTicketInfo;
 
     switch (json["ticket_type"]){

@@ -362,18 +362,22 @@ class CalendarWidgetState extends State<CalendarWidget>{
         const SizedBox(height: 12),
         eventTicketsGroups == null ?
 
-          Text("Error, tickets not found!") : // TODO: When error
+          StandardText(colorText: AppTextStyles.bookingTicket.color!, text: "Error, tickets not found!", fontSize: AppTextStyles.bookingTicket.fontSize!, fontFamily: AppTextStyles.bookingTicket.fontFamily!, lineHeight: 1, align: TextAlign.start) : // TODO: When error
 
-          ListView.builder(
-            itemCount: eventTicketsGroups!.length,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 6
-                ),
-                child: TicketsGroupWidget(eventTicketsGroups![index]),
-              );
-            }
+          SizedBox(
+            height: 500,
+            child: ListView.builder(
+              itemCount: eventTicketsGroups!.length,
+              itemBuilder: (context, index) {
+                print("DEBUG_BOOKINGS: List of groups (booking widget)");
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 6
+                  ),
+                  child: TicketsGroupWidget(eventTicketsGroups![index]),
+                );
+              }
+            ),
           )
       ],
     );
@@ -422,10 +426,26 @@ class CalendarWidgetState extends State<CalendarWidget>{
 
       if (state is CalendarEventTicketsLoadedSuccess){
         print("Event Tickets Loaded Successfully");
-        eventTicketsGroups = state.eventTickets.data.tickets_groups;
         setState((){
           _phase = 2;
+          print(state.eventTickets.toJsonString());
+          eventTicketsGroups = state.eventTickets.data.tickets_groups;
+          if (eventTicketsGroups == null){
+            print("Groups is null");
+          }
+          print("Groups is not null");
+          print("Groups length: " + eventTicketsGroups!.length.toString());
+          for (int i = 0; i < eventTicketsGroups!.length; i++){
+            print("Groups " + i.toString());
+            for (int j = 0; j < eventTicketsGroups![i].tickets.length; j++){
+              print("Ticket name: " + eventTicketsGroups![i].tickets[j].ticket_name);
+            }
+          }
         });
+      }
+
+      if (state is CalendarEventTicketsLoadedFailure){
+        print("event Tickets Loaded Failure");
       }
 
     } , child: BlocBuilder<CalendarBloc, CalendarState>(builder: (context, state) {

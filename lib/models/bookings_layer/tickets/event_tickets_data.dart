@@ -7,10 +7,12 @@ class EventTicketsData{
   EventTicketsData({required this.event_id, required this.tickets_groups});
 
   factory EventTicketsData.fromJson(Map<String, dynamic> json){
+    print("Json response (EventTicketsData): " + json.toString());
 
     List<TicketsGroup> groups = [];
-    if(json["tickets"] != null) {
+    if(json["tickets_groups"] != null) {
       var groupsFromJson = json["tickets_groups"] as List;
+      print("Json response (EventTicketsData[tickets_groups]): " + json["tickets_groups"].toString());
       groups = groupsFromJson.map((i) => TicketsGroup.fromJson(i)).toList();
     }
 
