@@ -26,11 +26,65 @@ class TicketsGroupWidget extends StatelessWidget{
             Ticket ticket = ticketsGroup.tickets[index];
 
             switch (ticket.ticket_type){
+
               case Ticket.CHECK: {
+                TicketInfoCheck ticketInfoCheck = ticket.ticket_info as TicketInfoCheck;
+
+                return TicketCheck(
+                  onPressed: (pressed){
+                    if (!pressed){
+                      ticketsGroup.tickets_selection.check_selected_units -= ticketInfoCheck.single_unit_value;
+                      return pressed;
+                    }else{
+                      int new_check_units = ticketsGroup.tickets_selection.check_selected_units + ticketInfoCheck.single_unit_value;
+                      if (new_check_units > ticketsGroup.total_rules.check_max_units){
+                        // TODO: SHOW ERROR
+                        print("Error in new check units");
+                        return !pressed;
+                      }
+                      ticketsGroup.tickets_selection.check_selected_units = new_check_units;
+                      return pressed;
+                    }
+                  },
+                  ticket: TicketCheckData(
+                      ticket.ticket_name,
+                      ticketInfoCheck
+                  )
+                );
+
                 return Text("Ticket check " + index.toString());
               }break;
 
               case Ticket.COUNTER: {
+                TicketInfoCounter ticketInfoCounter = ticket.ticket_info as TicketInfoCounter;
+                return TicketCounter(
+                  onPressed: (prev_value, next_value){
+
+                    int difference = 0;
+                    if (prev_value > next_value){
+                      difference = next_value - prev_value;
+                    }else{
+                      difference = prev_value - next_value;
+                    }
+
+                    int new_counter_units = ticketsGroup.tickets_selection.counter_selected_units + (difference * ticketInfoCounter.single_unit_value);
+                    if (new_counter_units > ticketsGroup.total_rules.counter_max_units){
+                      // TODO: SHOW ERROR
+                      print("Error in new counter units");
+                      return prev_value;
+                    }else{
+                      ticketsGroup.tickets_selection.counter_selected_units = new_counter_units;
+                      print("All OK new counter units");
+                      return next_value;
+                    }
+
+                  },
+                  ticket: TicketCounterData(
+                    ticket.ticket_name,
+                    ticketInfoCounter
+                  )
+                );
+
                 return Text("Ticket counter " + index.toString());
               }break;
 
