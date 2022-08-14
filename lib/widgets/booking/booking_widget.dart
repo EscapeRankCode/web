@@ -10,6 +10,8 @@ import 'package:flutter_escaperank_web/models/bookings_layer/calendar/calendar_g
 import 'package:flutter_escaperank_web/models/bookings_layer/calendar/calendar_simple_event.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/tickets/ticket.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/tickets/tickets_group.dart';
+import 'package:flutter_escaperank_web/models/bookings_layer/tickets/tickets_selection.dart';
+import 'package:flutter_escaperank_web/models/bookings_layer/tickets/total_rules.dart';
 import 'package:flutter_escaperank_web/models/escape_room.dart';
 import 'package:flutter_escaperank_web/services/calendar_service.dart';
 import 'package:flutter_escaperank_web/utils/app_colors.dart';
@@ -100,6 +102,7 @@ class CalendarWidgetState extends State<CalendarWidget>{
   CalendarSimpleEvent? selectedEvent;
   List<TicketsGroup>? eventTicketsGroups;
   List<Ticket>? eventTickets;
+  bool enable_step_phase_3 = false;
 
   int _phase = 1;
 
@@ -124,6 +127,8 @@ class CalendarWidgetState extends State<CalendarWidget>{
     setState(() {
       heightCalendar = month.weekday >= 6 ? 340 : 290;
     });
+
+    enable_step_phase_3 = false;
 
   }
 
@@ -366,17 +371,74 @@ class CalendarWidgetState extends State<CalendarWidget>{
 
           SizedBox(
             height: 500,
-            child: ListView.builder(
-              itemCount: eventTicketsGroups!.length,
-              itemBuilder: (context, index) {
-                print("DEBUG_BOOKINGS: List of groups (booking widget)");
-                return Padding(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 6
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SizedBox(
+                  height: 400,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      StandardText(
+                        text: FlutterI18n.translate(context, "num_players"),
+                        fontFamily: AppTextStyles.bookingTicketsTitle.fontFamily!,
+                        fontSize: AppTextStyles.bookingTicketsTitle.fontSize!,
+                        colorText: AppTextStyles.bookingTicketsTitle.color!,
+                        align: TextAlign.start,
+                        lineHeight: 1,
+                      ),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: eventTicketsGroups!.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 6,
+                                  horizontal: 12
+                              ),
+                              child: TicketsGroupWidget(
+                                  eventTicketsGroups![index],
+                                      (){
+                                    print("RUNNING RULES CHECK");
+                                    // TicketsSelection tickets_selection = TicketsSelection();
+                                    for (int i = 0; i < eventTicketsGroups!.length; i++){
+                                      bool selectionOk = check_group_selection(eventTicketsGroups![i]);
+                                      if(!selectionOk){
+                                        super.setState(() {
+                                          enable_step_phase_3 = false;
+                                        });
+                                        print("RULES CHECK - FALSE");
+                                        return;
+                                      }
+                                    }
+                                    super.setState((){
+                                      enable_step_phase_3 = true;
+                                    });
+                                    print("RULES CHECK - OK");
+                                  }
+                              ),
+                            );
+                        }
+                      )
+                    ],
                   ),
-                  child: TicketsGroupWidget(eventTicketsGroups![index]),
-                );
-              }
+                ),
+                StandardButton(
+                  colorButton: enable_step_phase_3 ? AppColors.yellowPrimary : AppColors.primaryYellow30,
+                  standardText: StandardText(
+                    text: FlutterI18n.translate(context, "next"),
+                    fontFamily: "Kanit_Medium",
+                    fontSize: 18,
+                    colorText: AppColors.white, align: TextAlign.center, lineHeight: 1,
+                  ),
+                  onPressed: (){
+                    if (enable_step_phase_3){
+
+                    }
+                    // If not: do nothing
+                  }
+                )
+              ],
             ),
           )
       ],
@@ -634,6 +696,19 @@ class CalendarWidgetState extends State<CalendarWidget>{
 
 
     }));
+  }
+
+  bool check_group_selection(TicketsGroup ticketsGroup){
+    TotalRules rules = ticketsGroup.total_rules;
+    TicketsSelection selection = ticketsGroup.tickets_selection;
+    bool counterOk = selection.counter_selected_units >= rules.counter_min_units && selection.counter_selected_units <= rules.counter_max_units;
+    bool checkOk = selection.check_selected_units >= rules.check_min_units && selection.check_selected_units <= rules.check_max_units;
+    bool optionOk = selection.option_selected_units >= rules.option_min_units && selection.option_selected_units <= rules.option_max_units;
+    print("SLECTION VS RULES");
+    print("Counter: selected (" + selection.counter_selected_units.toString() + ") - min (" + rules.counter_min_units.toString() + ") - max (" + rules.counter_max_units.toString() + ")");
+    print("Check: selected (" + selection.check_selected_units.toString() + ") - min (" + rules.check_min_units.toString() + ") - max (" + rules.check_max_units.toString() + ")");
+    print("Option: selected (" + selection.option_selected_units.toString() + ") - min (" + rules.option_min_units.toString() + ") - max (" + rules.option_max_units.toString() + ")");
+    return counterOk && checkOk && optionOk;
   }
 
 

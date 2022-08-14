@@ -52,28 +52,25 @@ class _TicketOptionState extends State<TicketOption> {
           });
 
         },
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-          child: Container(
-            decoration: BoxDecoration(
-                color: selected ? AppColors.yellowPrimary : AppColors.blackBackGround,
-                borderRadius: const BorderRadius.all(Radius.circular(6)),
-                border: Border.all(color: selected ? AppColors.yellowPrimary : AppColors.greyDark)
-            ),
-            child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                child: StandardText(
-                  colorText: AppTextStyles.bookingTicket.color!,
-                  text: widget.ticket.ticket_name,
-                  fontSize: AppTextStyles.bookingTicket.fontSize!,
-                  fontFamily: AppTextStyles.bookingTicket.fontFamily!,
-                  lineHeight: 1,
-                  align: TextAlign.center,
-                )
-              // Text(widget.ticket.ticket_name),
-            ),
+        child: Container(
+          decoration: BoxDecoration(
+              color: selected ? AppColors.yellowPrimary : AppColors.blackBackGround,
+              borderRadius: const BorderRadius.all(Radius.circular(6)),
+              border: Border.all(color: selected ? AppColors.yellowPrimary : AppColors.greyDark)
           ),
-        ),
+          child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: StandardText(
+                colorText: AppTextStyles.bookingTicket.color!,
+                text: widget.ticket.ticket_name,
+                fontSize: AppTextStyles.bookingTicket.fontSize!,
+                fontFamily: AppTextStyles.bookingTicket.fontFamily!,
+                lineHeight: 1,
+                align: TextAlign.center,
+              )
+            // Text(widget.ticket.ticket_name),
+          ),
+        )
       ),
     );
   }

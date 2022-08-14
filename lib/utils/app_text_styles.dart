@@ -166,5 +166,11 @@ class AppTextStyles{
       fontWeight: FontWeight.normal,
       fontFamily: "Montserrat_Regular"
   );
+  static const TextStyle bookingTicketsTitle = TextStyle(
+      color: AppColors.whiteText,
+      fontSize: 15,
+      fontWeight: FontWeight.bold,
+      fontFamily: "Montserrat_Bold"
+  );
 
 }
