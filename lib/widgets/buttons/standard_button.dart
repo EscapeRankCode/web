@@ -19,11 +19,38 @@ class StandardButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           primary: colorButton,
           padding: const EdgeInsets.all(16),
-          shape: new RoundedRectangleBorder(
-              borderRadius: new BorderRadius.circular(18.0)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18.0)
+          ),
         ),
         child: standardText,
         onPressed: onPressed,
+      ),
+    );
+  }
+}
+
+class StandardDisabledButton extends StatelessWidget {
+
+  Color colorButton;
+  StandardText standardText;
+
+  StandardDisabledButton({required this.colorButton, required this.standardText});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          primary: colorButton,
+          padding: const EdgeInsets.all(16),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18.0)
+          ),
+        ),
+        child: standardText,
+        onPressed: null,
       ),
     );
   }

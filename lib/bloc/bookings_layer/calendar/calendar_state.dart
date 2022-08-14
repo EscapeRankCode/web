@@ -41,3 +41,8 @@ class CalendarEventTicketsLoadedFailure extends CalendarState{
   CalendarEventTicketsLoadedFailure({required this.error});
 }
 
+
+// FORMS
+class CalendarEventFormLoading extends CalendarState{}
+// TODO: CalendarEventFormLoadedSuccess
+// TODO: CalendarEventFormLoadedFailure

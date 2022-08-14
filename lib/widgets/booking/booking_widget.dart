@@ -85,24 +85,26 @@ class CalendarWidgetState extends State<CalendarWidget>{
   DateTime _currentDate2 = DateTime.now();
   String _currentMonth = DateFormat.MMMM("es_ES").format(DateTime.now()).toUpperCase();
 
-  int slotBooking = 0;
-  String noSlotsDay = "";
-  int maxSeatsEvent = 0;
-  int maxSeatsLeft = 0;
-  // String minSeatsBuy;
   late SharedPreferences prefs;
   var _calendarBloc;
   double heightCalendar = 340;
   double widthCalendar = 340;
 
+  // PHASE 1: CALENDAR AND EVENTD
   List<CalendarSimpleEvent> slotsEvents = [];
   CalendarGeneral? visibleCalendar;
   late String timezone;
   List<SlotTime> slotsSelected = [];
-  CalendarSimpleEvent? selectedEvent;
-  List<TicketsGroup>? eventTicketsGroups;
+
+  // SELECTED EVENT
+  CalendarSimpleEvent? selectedEvent; // selected event
+
+  // PHASE 2
+  List<TicketsGroup>? eventTicketsGroups; // tickets and selections
   List<Ticket>? eventTickets;
   bool enable_step_phase_3 = false;
+
+
 
   int _phase = 1;
 
@@ -152,11 +154,12 @@ class CalendarWidgetState extends State<CalendarWidget>{
         event_id: slot.event.eventId
       )
     );
-    // TODO: WHAT DO WE DO WHEN USER CLICS ON A TIME
-    //  -- SAVE:
-    //    -- DATE
-    //    -- TIME
-    //    -- SLOT INFO (SlotTime object)
+  }
+
+  void _selectTickets(SlotTime slot){
+    _calendarBloc.add(
+
+    );
   }
 
   @override
@@ -279,8 +282,7 @@ class CalendarWidgetState extends State<CalendarWidget>{
                 return SlotTimeRow(
                   slot: slotsSelected[index],
                   onPressed: (pressed) {
-                    // TODO: JUMP TO PHASE X TO LOAD
-                    _selectTime(slotsSelected[index]);
+                    _selectTime(slotsSelected[index]); // Jumps to get tickets (in bloc)
                   },
                 );
               }),
@@ -423,21 +425,28 @@ class CalendarWidgetState extends State<CalendarWidget>{
                     ],
                   ),
                 ),
-                StandardButton(
-                  colorButton: enable_step_phase_3 ? AppColors.yellowPrimary : AppColors.primaryYellow30,
-                  standardText: StandardText(
-                    text: FlutterI18n.translate(context, "next"),
-                    fontFamily: "Kanit_Medium",
-                    fontSize: 18,
-                    colorText: AppColors.white, align: TextAlign.center, lineHeight: 1,
-                  ),
-                  onPressed: (){
-                    if (enable_step_phase_3){
+                enable_step_phase_3 ?
+                  StandardButton(
+                      colorButton: enable_step_phase_3 ? AppColors.yellowPrimary : AppColors.primaryYellow30,
+                      standardText: StandardText(
+                        text: FlutterI18n.translate(context, "next"),
+                        fontFamily: "Kanit_Medium",
+                        fontSize: 18,
+                        colorText: AppColors.white, align: TextAlign.center, lineHeight: 1,
+                      ),
+                      onPressed: (){
 
-                    }
-                    // If not: do nothing
-                  }
-                )
+                      }
+                  ) :
+                  StandardDisabledButton(
+                      colorButton: enable_step_phase_3 ? AppColors.yellowPrimary : AppColors.primaryYellow30,
+                      standardText: StandardText(
+                        text: FlutterI18n.translate(context, "next"),
+                        fontFamily: "Kanit_Medium",
+                        fontSize: 18,
+                        colorText: AppColors.white, align: TextAlign.center, lineHeight: 1,
+                      ),
+                  )
               ],
             ),
           )

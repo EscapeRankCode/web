@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter_escaperank_web/models/bookings_layer/tickets/tickets_group.dart';
 
 abstract class CalendarEvent extends Equatable{
   @override
@@ -25,3 +26,13 @@ class GetTickets extends CalendarEvent{
   GetTickets({this.token, required this.event_date, required this.event_time, required this.booking_system_id, required this.bs_config, required this.event_id});
 }
 
+
+class GetForm extends CalendarEvent{
+  String? token;
+  final int booking_system_id;
+  final int bs_config;
+  final String event_id;
+  final List<TicketsGroup> event_tickets;
+
+  GetForm({this.token, required this.booking_system_id, required this.bs_config ,required this.event_id, required this.event_tickets});
+}
