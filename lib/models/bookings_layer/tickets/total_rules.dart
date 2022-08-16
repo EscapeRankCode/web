@@ -25,4 +25,14 @@ class TotalRules{
       option_max_units: json["option_min_units"]
     );
   }
+
+  Map toJson() => {
+    'counter_min_units': counter_min_units,
+    'counter_max_units': counter_max_units,
+    'check_min_units': check_min_units,
+    'check_max_units': check_max_units,
+    'option_min_units': option_min_units,
+    'option_max_units': option_max_units
+  };
+
 }

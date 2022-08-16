@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_escaperank_web/models/bookings_layer/tickets/ticket_info.dart';
 
 class Ticket{
@@ -34,5 +36,11 @@ class Ticket{
     );
 
   }
+
+  Map toJson() => {
+    'ticket_name': ticket_name,
+    'ticket_type': ticket_type,
+    'ticket_info': jsonEncode(ticket_info)
+  };
 
 }

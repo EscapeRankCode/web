@@ -66,4 +66,25 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState>{
 
   }
 
+  Stream<CalendarState> _mapGetFormToState(GetForm event) async*{
+
+    yield CalendarEventFormLoading();
+
+    try{
+
+      var eventForm = await _calendarService.getEventForm(event.booking_system_id, event.bs_config, event.event_date, event.event_time, event.event_id, event.event_tickets);
+
+      if (eventForm != null){
+        yield CalendarEventFormLoadedSuccess(eventForm: eventForm);
+
+      }else{
+        yield CalendarEventFormLoadedFailure(error: "error_get_form");
+      }
+
+    }catch(err){
+      yield CalendarEventFormLoadedFailure(error: "error_get_form");
+    }
+
+  }
+
 }

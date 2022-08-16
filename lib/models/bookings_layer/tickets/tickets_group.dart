@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_escaperank_web/models/bookings_layer/tickets/ticket.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/tickets/tickets_selection.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/tickets/total_rules.dart';
@@ -27,4 +29,11 @@ class TicketsGroup{
     );
 
   }
+
+  Map toJson() => {
+    'tickets': jsonEncode(tickets),
+    'total_rules': jsonEncode(total_rules),
+    'tickets_selection': jsonEncode(tickets_selection)
+  };
+
 }

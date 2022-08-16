@@ -2,6 +2,7 @@
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/calendar/calendar_response.dart';
+import 'package:flutter_escaperank_web/models/bookings_layer/form/event_form_response.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/tickets/event_tickets_response.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -44,5 +45,14 @@ class CalendarEventTicketsLoadedFailure extends CalendarState{
 
 // FORMS
 class CalendarEventFormLoading extends CalendarState{}
-// TODO: CalendarEventFormLoadedSuccess
-// TODO: CalendarEventFormLoadedFailure
+
+class CalendarEventFormLoadedSuccess extends CalendarState{
+  final EventFormResponse eventForm;
+
+  CalendarEventFormLoadedSuccess({required this.eventForm});
+}
+
+class CalendarEventFormLoadedFailure extends CalendarState{
+  final String error;
+  CalendarEventFormLoadedFailure({required this.error});
+}

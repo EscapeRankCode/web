@@ -28,6 +28,13 @@ class TicketInfoOption implements TicketInfo{
         currency: json["currency"]
     );
   }
+
+  Map toJson() => {
+    'default_value': default_value,
+    'single_unit_value': single_unit_value,
+    'price_per_unit': price_per_unit,
+    'currency': currency
+  };
 }
 
 class TicketInfoCheck implements TicketInfo{
@@ -58,6 +65,14 @@ class TicketInfoCheck implements TicketInfo{
         currency: json["currency"]
     );
   }
+
+  Map toJson() => {
+    'default_value': default_value,
+    'single_unit_value': single_unit_value,
+    'price_per_unit': price_per_unit,
+    'currency': currency
+  };
+
 }
 
 class TicketInfoCounter implements TicketInfo{
@@ -96,4 +111,14 @@ class TicketInfoCounter implements TicketInfo{
       currency: json["currency"]
     );
   }
+
+  Map toJson() => {
+    'min_option' : min_option,
+    'max_option' : max_option,
+    'default_value': default_value,
+    'single_unit_value': single_unit_value,
+    'price_per_unit': price_per_unit,
+    'currency': currency
+  };
+
 }

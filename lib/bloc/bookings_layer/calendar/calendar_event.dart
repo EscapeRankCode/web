@@ -31,8 +31,10 @@ class GetForm extends CalendarEvent{
   String? token;
   final int booking_system_id;
   final int bs_config;
+  final String event_date;
+  final String event_time;
   final String event_id;
   final List<TicketsGroup> event_tickets;
 
-  GetForm({this.token, required this.booking_system_id, required this.bs_config ,required this.event_id, required this.event_tickets});
+  GetForm({this.token, required this.booking_system_id, required this.bs_config, required this.event_date, required this.event_time, required this.event_id, required this.event_tickets});
 }

@@ -156,9 +156,17 @@ class CalendarWidgetState extends State<CalendarWidget>{
     );
   }
 
+  // TODO: call this function on the button when tickets are selected
   void _selectTickets(SlotTime slot){
     _calendarBloc.add(
-
+      GetForm(
+          booking_system_id: widget.escapeRoom.bookingSystemId!,
+          bs_config: widget.escapeRoom.bsConfigId!,
+          event_date: DateFormat('dd/MM/yyyy').format(_currentDate2),,
+          event_time: slot.event.time,
+          event_id: slot.event.eventId,
+          event_tickets: eventTicketsGroups!
+      )
     );
   }
 
