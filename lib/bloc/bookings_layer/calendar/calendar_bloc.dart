@@ -22,6 +22,9 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState>{
     if (event is GetTickets){
       yield* _mapGetTicketsToState(event);
     }
+    if (event is GetForm){
+      yield* _mapGetFormToState(event);
+    }
 
     yield CalendarLoadedFailure(error: "error_get_calendar");
   }

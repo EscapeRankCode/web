@@ -97,6 +97,7 @@ class CalendarWidgetState extends State<CalendarWidget>{
   List<SlotTime> slotsSelected = [];
 
   // SELECTED EVENT
+  SlotTime? selectedSlot;
   CalendarSimpleEvent? selectedEvent; // selected event
 
   // PHASE 2
@@ -145,26 +146,26 @@ class CalendarWidgetState extends State<CalendarWidget>{
   }
 
   void _selectTime(SlotTime slot){
+    selectedSlot = slot;
     _calendarBloc.add(
       GetTickets(
         event_date: DateFormat('dd/MM/yyyy').format(_currentDate2),
-        event_time: slot.event.time,
+        event_time: selectedSlot!.event.time,
         booking_system_id: widget.escapeRoom.bookingSystemId!,
         bs_config: widget.escapeRoom.bsConfigId!,
-        event_id: slot.event.eventId
+        event_id: selectedSlot!.event.eventId
       )
     );
   }
 
-  // TODO: call this function on the button when tickets are selected
-  void _selectTickets(SlotTime slot){
+  void _selectTickets(){
     _calendarBloc.add(
       GetForm(
           booking_system_id: widget.escapeRoom.bookingSystemId!,
           bs_config: widget.escapeRoom.bsConfigId!,
           event_date: DateFormat('dd/MM/yyyy').format(_currentDate2),,
-          event_time: slot.event.time,
-          event_id: slot.event.eventId,
+          event_time: selectedSlot!.event.time,
+          event_id: selectedSlot!.event.eventId,
           event_tickets: eventTicketsGroups!
       )
     );
@@ -443,7 +444,7 @@ class CalendarWidgetState extends State<CalendarWidget>{
                         colorText: AppColors.white, align: TextAlign.center, lineHeight: 1,
                       ),
                       onPressed: (){
-
+                        _selectTickets(slot)
                       }
                   ) :
                   StandardDisabledButton(

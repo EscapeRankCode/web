@@ -130,6 +130,16 @@ class CalendarService{
     }
   }
 
+
+  /// Makes a call to the back end to get the form fields of an event
+  /// Paramenters:
+  ///   [booking_system_id] id of the BS
+  ///   [bs_config] id of the BS Config
+  ///   [event_date] date in format dd/mm/yyyy
+  ///   [event_time] time in format hh:mm
+  ///   [event_id] id of the event
+  ///   [event_tickets] all groups of the tickets that have been selected
+  ///
   Future<EventFormResponse?> getEventForm(int booking_system_id, int bs_config, String event_date, String event_time, String event_id, List<TicketsGroup> event_tickets) async {
 
     String event_tickets_json_string = jsonEncode(event_tickets);
