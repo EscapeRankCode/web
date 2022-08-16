@@ -142,7 +142,7 @@ class CalendarService{
   ///
   Future<EventFormResponse?> getEventForm(int booking_system_id, int bs_config, String event_date, String event_time, String event_id, List<TicketsGroup> event_tickets) async {
 
-    String event_tickets_json_string = jsonEncode(event_tickets);
+    String eventTicketsJsonString = jsonEncode(event_tickets);
 
     var headers = {
       'ApiKey': API.apiKey,
@@ -150,17 +150,35 @@ class CalendarService{
       'Authorization': CalendarService.BEARER, // TODO: REMOVE THE BEARER
     };
 
-    String url = 'http://' + Config.BASE_URL + BookingsLayerApi.getEventTickets +
-        '?booking_system_id=' + booking_system_id.toString() +
+    String url = 'http://' + Config.BASE_URL + BookingsLayerApi.getEventForm; // +
+    /*    '?booking_system_id=' + booking_system_id.toString() +
         '&bs_config=' + bs_config.toString() +
         '&event_date=' + event_date +
         '&event_time=' + event_time +
         '&event_id=' + event_id +
-        '&event_tickets=' + event_tickets_json_string;
+        '&event_tickets=' + eventTicketsJsonString;*/
 
-    var request = http.Request('GET', Uri.parse(url));
+    print("FORM URL");
+    print(url);
+
+    // var request = http.Request('GET', Uri.parse(url));
+    var request = http.Request('POST', Uri.parse(url));
+
 
     request.headers.addAll(headers);
+
+    var request_body = json.encode({
+      "booking_system_id": booking_system_id,
+      "bs_config": bs_config,
+      "event_date": event_date,
+      "event_time": event_time,
+      "event_id": event_id,
+      "event_tickets": jsonEncode(event_tickets)
+    });
+
+    request.body = request_body;
+
+    print("FORM BODY: " + request_body);
 
     http.StreamedResponse response = await request.send();
 
@@ -168,6 +186,7 @@ class CalendarService{
       print("--- Response is status 200");
       String res = await response.stream.bytesToString();
       dynamic body = json.decode(res);
+      print("FORM BODY: " + body);
       return EventFormResponse.fromJson(body);
     }
     else {

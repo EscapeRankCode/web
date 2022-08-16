@@ -8,6 +8,7 @@ import 'package:flutter_escaperank_web/bloc/bookings_layer/calendar/calendar_sta
 import 'package:flutter_escaperank_web/models/bookings_layer/calendar/calendar_day.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/calendar/calendar_general.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/calendar/calendar_simple_event.dart';
+import 'package:flutter_escaperank_web/models/bookings_layer/form/event_form_data.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/tickets/ticket.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/tickets/tickets_group.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/tickets/tickets_selection.dart';
@@ -105,6 +106,9 @@ class CalendarWidgetState extends State<CalendarWidget>{
   List<Ticket>? eventTickets;
   bool enable_step_phase_3 = false;
 
+  // PHASE 3
+  EventFormData? _formData;
+
 
 
   int _phase = 1;
@@ -163,7 +167,7 @@ class CalendarWidgetState extends State<CalendarWidget>{
       GetForm(
           booking_system_id: widget.escapeRoom.bookingSystemId!,
           bs_config: widget.escapeRoom.bsConfigId!,
-          event_date: DateFormat('dd/MM/yyyy').format(_currentDate2),,
+          event_date: DateFormat('dd/MM/yyyy').format(_currentDate2),
           event_time: selectedSlot!.event.time,
           event_id: selectedSlot!.event.eventId,
           event_tickets: eventTicketsGroups!
@@ -444,7 +448,7 @@ class CalendarWidgetState extends State<CalendarWidget>{
                         colorText: AppColors.white, align: TextAlign.center, lineHeight: 1,
                       ),
                       onPressed: (){
-                        _selectTickets(slot)
+                        _selectTickets();
                       }
                   ) :
                   StandardDisabledButton(
@@ -526,6 +530,33 @@ class CalendarWidgetState extends State<CalendarWidget>{
 
       if (state is CalendarEventTicketsLoadedFailure){
         print("event Tickets Loaded Failure");
+      }
+
+
+      if (state is CalendarEventFormLoading){
+        print("Event Form Loading");
+      }
+
+      if (state is CalendarEventFormLoadedFailure){
+        print("Event Form Loaded Failure");
+      }
+
+      if (state is CalendarEventFormLoadedSuccess){
+        setState((){
+          _phase = 3;
+          print(state.eventForm.toJsonString());
+          _formData = state.eventForm.data;
+          // eventTicketsGroups = state.eventTickets.data.tickets_groups;
+          if (_formData == null){
+            print("Form is null");
+          }
+          print("Form is not null");
+          print("Form Fields length: " + _formData!.fields.length.toString());
+          for (int i = 0; i < _formData!.fields.length; i++){
+            print("Field " + i.toString());
+            print("Field name: " + _formData!.fields[i].field_text);
+          }
+        });
       }
 
     } , child: BlocBuilder<CalendarBloc, CalendarState>(builder: (context, state) {
@@ -708,7 +739,8 @@ class CalendarWidgetState extends State<CalendarWidget>{
            */
           child: _phase == 0 ? _booking_phase_0 :
           _phase == 1 ? _booking_phase_1 :
-          _phase == 2 ? _booking_phase_2 : Text("Phase X"),
+          _phase == 2 ? _booking_phase_2 :
+          _phase == 3 ? _booking_phase_2 : Text("Phase X"),
         )
       );
 

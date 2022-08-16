@@ -23,4 +23,10 @@ class FieldOption{
     );
   }
 
+  Map toJson() => {
+    'option_text': option_text,
+    'option_value': option_value,
+    'option_others_map': jsonEncode(option_others_map)
+  };
+
 }

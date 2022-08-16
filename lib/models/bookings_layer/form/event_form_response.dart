@@ -1,4 +1,6 @@
 
+import 'dart:convert';
+
 import 'package:flutter_escaperank_web/models/bookings_layer/form/event_form_data.dart';
 
 class EventFormResponse{
@@ -20,7 +22,7 @@ class EventFormResponse{
   }
 
   String toJsonString(){
-    String data_string = "Json";
+    String data_string = "Data: " + jsonEncode(data);
     return data_string;
   }
 }

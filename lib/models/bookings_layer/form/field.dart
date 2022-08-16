@@ -1,4 +1,6 @@
 
+import 'dart:convert';
+
 import 'package:flutter_escaperank_web/models/bookings_layer/form/field_option.dart';
 
 class Field{
@@ -47,5 +49,14 @@ class Field{
         field_options: field_options
     );
   }
+
+  Map toJson() => {
+    'field_type': field_type,
+    'field_required': field_required,
+    'field_key': field_key,
+    'field_text': field_text,
+    'field_default_value': field_default_value,
+    'field_options': jsonEncode(field_options)
+  };
   
 }

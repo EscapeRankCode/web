@@ -1,4 +1,6 @@
 
+import 'dart:convert';
+
 import 'package:flutter_escaperank_web/models/bookings_layer/form/field.dart';
 
 class EventFormData{
@@ -22,5 +24,10 @@ class EventFormData{
         fields: fields
     );
   }
+
+  Map toJson() => {
+    'event_id': event_id,
+    'fields': jsonEncode(fields)
+  };
 
 }
