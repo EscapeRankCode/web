@@ -286,5 +286,8 @@
   "filters_name_section_title": "Nombre y localización",
   "filters_name_section_filters": "Filtros",
   "times_title": "Sesiones el día ",
-  "times_empty": "No hay horas disponibles para el día seleccionado"
+  "times_empty": "No hay horas disponibles para el día seleccionado",
+  "form_error_empty_text": "Por favor, introduzca algún valor",
+  "form_error_cehck_not_checked": "Por favor, marque esta casilla",
+  "form_hint_select_option": "Por favor, seleccione una opción"
 }

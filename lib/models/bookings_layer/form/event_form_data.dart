@@ -10,7 +10,7 @@ class EventFormData{
   EventFormData({required this.event_id, required this.fields});
 
   factory EventFormData.fromJson(Map<String, dynamic> json){
-    print("Json response (EventTicketsData): " + json.toString());
+    print("Json response (EventFormData): " + json.toString());
 
     List<Field> fields = [];
     if(json["fields"] != null) {

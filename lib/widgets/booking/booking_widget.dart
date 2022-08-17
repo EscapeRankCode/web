@@ -1,5 +1,7 @@
+import 'package:checkbox_formfield/checkbox_formfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_calendar_carousel/classes/event.dart';
 import 'package:flutter_escaperank_web/bloc/bookings_layer/calendar/calendar_bloc.dart';
@@ -9,6 +11,8 @@ import 'package:flutter_escaperank_web/models/bookings_layer/calendar/calendar_d
 import 'package:flutter_escaperank_web/models/bookings_layer/calendar/calendar_general.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/calendar/calendar_simple_event.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/form/event_form_data.dart';
+import 'package:flutter_escaperank_web/models/bookings_layer/form/field.dart';
+import 'package:flutter_escaperank_web/models/bookings_layer/form/field_option.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/tickets/ticket.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/tickets/tickets_group.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/tickets/tickets_selection.dart';
@@ -24,9 +28,11 @@ import 'package:flutter_escaperank_web/widgets/text/legend_circle.dart';
 import 'package:flutter_escaperank_web/widgets/text/standard_text.dart';
 import 'package:flutter_escaperank_web/widgets/text/title_circle.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart' show CalendarCarousel, WeekdayFormat;
+import 'package:url_launcher/url_launcher.dart';
 
 class BookingsWidget extends StatefulWidget{
   final EscapeRoom escapeRoom;
@@ -108,7 +114,8 @@ class CalendarWidgetState extends State<CalendarWidget>{
 
   // PHASE 3
   EventFormData? _formData;
-
+  final _formKey = GlobalKey<FormState>();
+  Map<String, FieldOption> field_options_selected = {}; // where key is field_key
 
 
   int _phase = 1;
@@ -382,7 +389,14 @@ class CalendarWidgetState extends State<CalendarWidget>{
         const SizedBox(height: 12),
         eventTicketsGroups == null ?
 
-          StandardText(colorText: AppTextStyles.bookingTicket.color!, text: "Error, tickets not found!", fontSize: AppTextStyles.bookingTicket.fontSize!, fontFamily: AppTextStyles.bookingTicket.fontFamily!, lineHeight: 1, align: TextAlign.start) : // TODO: When error
+          StandardText(
+            colorText: AppTextStyles.bookingTicket.color!,
+            text: "Error, tickets not found!",
+            fontSize: AppTextStyles.bookingTicket.fontSize!,
+            fontFamily: AppTextStyles.bookingTicket.fontFamily!,
+            lineHeight: 1,
+            align: TextAlign.start
+          ) : // TODO: When error
 
           SizedBox(
             height: 500,
@@ -466,11 +480,210 @@ class CalendarWidgetState extends State<CalendarWidget>{
       ],
     );
 
+    var _booking_phase_3 = Column(
+      children: [
+        const SizedBox(height: 12),
 
+        _formData == null ?
+
+        StandardText(
+          colorText: AppTextStyles.bookingTicket.color!,
+          text: "Error, form not found!",
+          fontSize: AppTextStyles.bookingTicket.fontSize!,
+          fontFamily: AppTextStyles.bookingTicket.fontFamily!,
+          lineHeight: 1,
+          align: TextAlign.start
+        ) : // TODO: When error
+
+        Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _formData!.fields.length,
+                  itemBuilder: (context, index) {
+
+                    Field field = _formData!.fields[index];
+                    var field_widget;
+
+                    switch (field.field_type){
+
+                      case Field.FIELD_TYPE_CHECK:
+                        field_widget = CheckboxListTileFormField(
+                          title: Linkify(
+                            text: field.field_text,
+                            onOpen: (link) async{
+                              if (await canLaunch(link.url)){
+                                await launch(link.url);
+                              }else{
+                                throw 'Could not launch $link';
+                              }
+                            },
+                            style: AppTextStyles.bookingFormTextInput_Label,
+                            linkStyle: AppTextStyles.bookingFormTextInput_Title,
+                          ),
+                          validator: (value){
+                            if (field.field_required && !value!){
+                              return FlutterI18n.translate(context, "form_error_cehck_not_checked");
+                            }
+                            return null;
+                          },
+                          checkColor: AppColors.whiteText,
+                          activeColor: AppColors.yellowPrimary,
+                        );
+                        break;
+
+                      case Field.FIELD_TYPE_TEXT:
+                        field_widget = TextFormField(
+                          // Decoration
+                          decoration: InputDecoration(
+                            labelText: field.field_required ? field.field_text + " *" : field.field_text,
+                            labelStyle: AppTextStyles.bookingFormTextInput_Title,
+                            enabledBorder: const UnderlineInputBorder(
+                              borderSide: BorderSide(color: AppColors.whiteText),
+                            ),
+                            focusedBorder: const UnderlineInputBorder(
+                              borderSide: BorderSide(color: AppColors.yellowPrimary),
+                            ),
+                          ),
+                          cursorColor: AppColors.yellowPrimary,
+                          style: AppTextStyles.bookingFormTextInput_Label,
+                          // Validator
+                          validator: (value) {
+                            if ((value == null || value.isEmpty) && field.field_required) {
+                              return FlutterI18n.translate(context, "form_error_empty_text");
+                            }
+                            return null;
+                          },
+
+
+                        );
+                        break;
+
+                      case Field.FIELD_TYPE_NUMBER:
+                        field_widget = TextFormField(
+                          // Decoration
+                          decoration: InputDecoration(
+                            labelText: field.field_required ? field.field_text + " *" : field.field_text,
+                            labelStyle: AppTextStyles.bookingFormTextInput_Title,
+                            enabledBorder: const UnderlineInputBorder(
+                              borderSide: BorderSide(color: AppColors.whiteText),
+                            ),
+                            focusedBorder: const UnderlineInputBorder(
+                              borderSide: BorderSide(color: AppColors.yellowPrimary),
+                            ),
+                          ),
+                          keyboardType: TextInputType.number,
+                          inputFormatters: <TextInputFormatter>[
+                            FilteringTextInputFormatter.digitsOnly
+                          ],
+                          cursorColor: AppColors.yellowPrimary,
+                          style: AppTextStyles.bookingFormTextInput_Label,
+                          // Validator
+                          validator: (value) {
+                            if ((value == null || value.isEmpty) && field.field_required) {
+                              return FlutterI18n.translate(context, "form_error_empty_text");
+                            }
+                            return null;
+                          },
+
+
+                        );
+                        break;
+
+                      case Field.FIELD_TYPE_SELECT:
+                        String? _selectedOption;
+                        field_widget = DropdownButton(
+                            value: _selectedOption,
+                            icon: const Icon(Icons.keyboard_arrow_down),
+                            dropdownColor: AppColors.yellowPrimary,
+
+                            hint: StandardText(
+                              text: FlutterI18n.translate(context, "form_hint_select_option"),
+                              colorText: AppTextStyles.bookingFormTextInput_Hint.color!,
+                              fontSize: AppTextStyles.bookingFormTextInput_Hint.fontSize!,
+                              fontFamily: AppTextStyles.bookingFormTextInput_Hint.fontFamily!,
+                              lineHeight: 1,
+                              align: TextAlign.start,
+                            ),
+
+                            items: field.field_options!.map((FieldOption option){
+                              return DropdownMenuItem(
+                                value: option.option_value,
+                                child: StandardText(
+                                  text: option.option_text,
+                                  colorText: AppTextStyles.bookingFormTextInput_Label.color!,
+                                  fontSize: AppTextStyles.bookingFormTextInput_Label.fontSize!,
+                                  fontFamily: AppTextStyles.bookingFormTextInput_Label.fontFamily!,
+                                  lineHeight: 1,
+                                  align: TextAlign.start,
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue){
+                              super.setState((){
+                                _selectedOption = newValue!;
+                              });
+                            }
+
+                        );
+                        break;
+
+                      default:
+                        field_widget = Text(field.field_text);
+                        break;
+                    }
+
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 6,
+                          horizontal: 12
+                      ),
+                      child: field_widget,
+                    );
+                  }
+              ),
+
+              const SizedBox(height: 20),
+
+              true ? // enable_step_phase_4 ?
+              StandardButton(
+                  colorButton: enable_step_phase_3 ? AppColors.yellowPrimary : AppColors.primaryYellow30,
+                  standardText: StandardText(
+                    text: FlutterI18n.translate(context, "next"),
+                    fontFamily: "Kanit_Medium",
+                    fontSize: 18,
+                    colorText: AppColors.white, align: TextAlign.center, lineHeight: 1,
+                  ),
+                  onPressed: (){
+                    if (_formKey.currentState!.validate()){
+                      print("Form data is OK");
+                    }else{
+                      print("Form data is not OK");
+                    }
+                  }
+              ) :
+              StandardDisabledButton(
+                colorButton: enable_step_phase_3 ? AppColors.yellowPrimary : AppColors.primaryYellow30,
+                standardText: StandardText(
+                  text: FlutterI18n.translate(context, "next"),
+                  fontFamily: "Kanit_Medium",
+                  fontSize: 18,
+                  colorText: AppColors.white, align: TextAlign.center, lineHeight: 1,
+                ),
+              )
+
+            ],
+          ),
+        )
+      ],
+    );
 
 
     return BlocListener<CalendarBloc, CalendarState>(listener: (context, state) {
 
+      // PHASE 1 -------
       if (state is CalendarLoading){
         print("Calendar Loading state");
         setState((){
@@ -501,6 +714,7 @@ class CalendarWidgetState extends State<CalendarWidget>{
         print("Calendar Loading Failure state");
       }
 
+      // PHASE 2 -------
       if (state is CalendarEventTicketsLoading){
         print("Event Tickets Loading state");
         setState((){
@@ -532,19 +746,15 @@ class CalendarWidgetState extends State<CalendarWidget>{
         print("event Tickets Loaded Failure");
       }
 
-
+      // PHASE 3 -------
       if (state is CalendarEventFormLoading){
         print("Event Form Loading");
-      }
-
-      if (state is CalendarEventFormLoadedFailure){
-        print("Event Form Loaded Failure");
       }
 
       if (state is CalendarEventFormLoadedSuccess){
         setState((){
           _phase = 3;
-          print(state.eventForm.toJsonString());
+          // print(state.eventForm.toJsonString());
           _formData = state.eventForm.data;
           // eventTicketsGroups = state.eventTickets.data.tickets_groups;
           if (_formData == null){
@@ -558,6 +768,12 @@ class CalendarWidgetState extends State<CalendarWidget>{
           }
         });
       }
+
+      if (state is CalendarEventFormLoadedFailure){
+        print("Event Form Loaded Failure");
+      }
+
+      // PHASE 4 ------
 
     } , child: BlocBuilder<CalendarBloc, CalendarState>(builder: (context, state) {
       return SizedBox(
@@ -740,7 +956,7 @@ class CalendarWidgetState extends State<CalendarWidget>{
           child: _phase == 0 ? _booking_phase_0 :
           _phase == 1 ? _booking_phase_1 :
           _phase == 2 ? _booking_phase_2 :
-          _phase == 3 ? _booking_phase_2 : Text("Phase X"),
+          _phase == 3 ? _booking_phase_3 : Text("Phase X"),
         )
       );
 

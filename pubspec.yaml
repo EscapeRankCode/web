@@ -81,6 +81,10 @@ dependencies:
   shimmer: ^2.0.0
   # Calendar carousel
   flutter_calendar_carousel: ^2.4.0
+  # Checkbox Form Field
+  checkbox_formfield: ^0.2.0
+  # Linkify
+  flutter_linkify: ^5.0.2
 
 
 dev_dependencies:

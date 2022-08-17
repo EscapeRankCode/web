@@ -142,8 +142,6 @@ class CalendarService{
   ///
   Future<EventFormResponse?> getEventForm(int booking_system_id, int bs_config, String event_date, String event_time, String event_id, List<TicketsGroup> event_tickets) async {
 
-    String eventTicketsJsonString = jsonEncode(event_tickets);
-
     var headers = {
       'ApiKey': API.apiKey,
       'accept': 'application/json',
@@ -151,17 +149,10 @@ class CalendarService{
     };
 
     String url = 'http://' + Config.BASE_URL + BookingsLayerApi.getEventForm; // +
-    /*    '?booking_system_id=' + booking_system_id.toString() +
-        '&bs_config=' + bs_config.toString() +
-        '&event_date=' + event_date +
-        '&event_time=' + event_time +
-        '&event_id=' + event_id +
-        '&event_tickets=' + eventTicketsJsonString;*/
 
     print("FORM URL");
     print(url);
 
-    // var request = http.Request('GET', Uri.parse(url));
     var request = http.Request('POST', Uri.parse(url));
 
 
@@ -178,16 +169,17 @@ class CalendarService{
 
     request.body = request_body;
 
-    print("FORM BODY: " + request_body);
+    // print("FORM BODY: " + request_body);
 
     http.StreamedResponse response = await request.send();
 
     if (response.statusCode == 200) {
       print("--- Response is status 200");
       String res = await response.stream.bytesToString();
-      dynamic body = json.decode(res);
-      print("FORM BODY: " + body);
-      return EventFormResponse.fromJson(body);
+      print("response is : " + res);
+      Map<String, dynamic> json_map = json.decode(res);
+      print("FORM BODY: " + json_map.toString());
+      return EventFormResponse.fromJson(json_map);
     }
     else {
       print("--- Response is not status 200");

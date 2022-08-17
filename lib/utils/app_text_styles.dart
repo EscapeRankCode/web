@@ -173,4 +173,24 @@ class AppTextStyles{
       fontFamily: "Montserrat_Bold"
   );
 
+  // FORM
+  static const TextStyle bookingFormTextInput_Title = TextStyle(
+      color: AppColors.yellowPrimary,
+      fontSize: 15,
+      fontWeight: FontWeight.bold,
+      fontFamily: "Montserrat_Bold"
+  );
+  static const TextStyle bookingFormTextInput_Label = TextStyle(
+      color: AppColors.whiteText,
+      fontSize: 15,
+      fontWeight: FontWeight.normal,
+      fontFamily: "Montserrat_Regular"
+  );
+  static const TextStyle bookingFormTextInput_Hint = TextStyle(
+      color: AppColors.greyDarkText,
+      fontSize: 15,
+      fontWeight: FontWeight.normal,
+      fontFamily: "Montserrat_Regular"
+  );
+
 }
