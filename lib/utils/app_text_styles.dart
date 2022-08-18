@@ -192,5 +192,12 @@ class AppTextStyles{
       fontWeight: FontWeight.normal,
       fontFamily: "Montserrat_Regular"
   );
+  static const TextStyle bookingFormOptionErrorMsg = TextStyle(
+      color: AppColors.primaryRed,
+      fontSize: 12,
+      fontWeight: FontWeight.normal,
+      fontFamily: "Montserrat_Regular"
+  );
+
 
 }

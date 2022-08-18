@@ -1,4 +1,5 @@
 import 'package:checkbox_formfield/checkbox_formfield.dart';
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -115,7 +116,9 @@ class CalendarWidgetState extends State<CalendarWidget>{
   // PHASE 3
   EventFormData? _formData;
   final _formKey = GlobalKey<FormState>();
-  Map<String, FieldOption> field_options_selected = {}; // where key is field_key
+  Map<String, String> field_options_selected = {}; // where key is field_key
+  List<Field> manual_validate_fields = [];
+  Map<String, bool> validations = {};
 
 
   int _phase = 1;
@@ -398,85 +401,79 @@ class CalendarWidgetState extends State<CalendarWidget>{
             align: TextAlign.start
           ) : // TODO: When error
 
-          SizedBox(
-            height: 500,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                SizedBox(
-                  height: 400,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      StandardText(
-                        text: FlutterI18n.translate(context, "num_players"),
-                        fontFamily: AppTextStyles.bookingTicketsTitle.fontFamily!,
-                        fontSize: AppTextStyles.bookingTicketsTitle.fontSize!,
-                        colorText: AppTextStyles.bookingTicketsTitle.color!,
-                        align: TextAlign.start,
-                        lineHeight: 1,
-                      ),
-                      ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: eventTicketsGroups!.length,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 6,
-                                  horizontal: 12
-                              ),
-                              child: TicketsGroupWidget(
-                                  eventTicketsGroups![index],
-                                      (){
-                                    print("RUNNING RULES CHECK");
-                                    // TicketsSelection tickets_selection = TicketsSelection();
-                                    for (int i = 0; i < eventTicketsGroups!.length; i++){
-                                      bool selectionOk = check_group_selection(eventTicketsGroups![i]);
-                                      if(!selectionOk){
-                                        super.setState(() {
-                                          enable_step_phase_3 = false;
-                                        });
-                                        print("RULES CHECK - FALSE");
-                                        return;
-                                      }
-                                    }
-                                    super.setState((){
-                                      enable_step_phase_3 = true;
-                                    });
-                                    print("RULES CHECK - OK");
-                                  }
-                              ),
-                            );
-                        }
-                      )
-                    ],
-                  ),
+                StandardText(
+                  text: FlutterI18n.translate(context, "num_players"),
+                  fontFamily: AppTextStyles.bookingTicketsTitle.fontFamily!,
+                  fontSize: AppTextStyles.bookingTicketsTitle.fontSize!,
+                  colorText: AppTextStyles.bookingTicketsTitle.color!,
+                  align: TextAlign.start,
+                  lineHeight: 1,
                 ),
-                enable_step_phase_3 ?
-                  StandardButton(
-                      colorButton: enable_step_phase_3 ? AppColors.yellowPrimary : AppColors.primaryYellow30,
-                      standardText: StandardText(
-                        text: FlutterI18n.translate(context, "next"),
-                        fontFamily: "Kanit_Medium",
-                        fontSize: 18,
-                        colorText: AppColors.white, align: TextAlign.center, lineHeight: 1,
-                      ),
-                      onPressed: (){
-                        _selectTickets();
-                      }
-                  ) :
-                  StandardDisabledButton(
-                      colorButton: enable_step_phase_3 ? AppColors.yellowPrimary : AppColors.primaryYellow30,
-                      standardText: StandardText(
-                        text: FlutterI18n.translate(context, "next"),
-                        fontFamily: "Kanit_Medium",
-                        fontSize: 18,
-                        colorText: AppColors.white, align: TextAlign.center, lineHeight: 1,
-                      ),
-                  )
+                ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: eventTicketsGroups!.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 6,
+                            horizontal: 12
+                        ),
+                        child: TicketsGroupWidget(
+                            eventTicketsGroups![index], (){
+                              print("RUNNING RULES CHECK");
+                              // TicketsSelection tickets_selection = TicketsSelection();
+                              for (int i = 0; i < eventTicketsGroups!.length; i++){
+                                bool selectionOk = check_group_selection(eventTicketsGroups![i]);
+                                if(!selectionOk){
+                                  super.setState(() {
+                                    enable_step_phase_3 = false;
+                                  });
+                                  print("RULES CHECK - FALSE");
+                                  return;
+                                }
+                              }
+                              super.setState((){
+                                enable_step_phase_3 = true;
+                              });
+                              print("RULES CHECK - OK");
+                            }
+                        ),
+                      );
+                    }
+                )
               ],
             ),
-          )
+            const SizedBox(height: 12),
+            enable_step_phase_3 ?
+            StandardButton(
+                colorButton: enable_step_phase_3 ? AppColors.yellowPrimary : AppColors.primaryYellow30,
+                standardText: StandardText(
+                  text: FlutterI18n.translate(context, "next"),
+                  fontFamily: "Kanit_Medium",
+                  fontSize: 18,
+                  colorText: AppColors.white, align: TextAlign.center, lineHeight: 1,
+                ),
+                onPressed: (){
+                  _selectTickets();
+                }
+            ) :
+            StandardDisabledButton(
+              colorButton: enable_step_phase_3 ? AppColors.yellowPrimary : AppColors.primaryYellow30,
+              standardText: StandardText(
+                text: FlutterI18n.translate(context, "next"),
+                fontFamily: "Kanit_Medium",
+                fontSize: 18,
+                colorText: AppColors.white, align: TextAlign.center, lineHeight: 1,
+              ),
+            )
+          ],
+        ),
       ],
     );
 
@@ -593,40 +590,118 @@ class CalendarWidgetState extends State<CalendarWidget>{
                         break;
 
                       case Field.FIELD_TYPE_SELECT:
-                        String? _selectedOption;
-                        field_widget = DropdownButton(
-                            value: _selectedOption,
-                            icon: const Icon(Icons.keyboard_arrow_down),
-                            dropdownColor: AppColors.yellowPrimary,
+                        if(!manual_validate_fields.contains(field)){
+                          manual_validate_fields.add(field); // add this field to manual validate
+                          validations[field.field_key] = true;
+                        }
 
-                            hint: StandardText(
-                              text: FlutterI18n.translate(context, "form_hint_select_option"),
-                              colorText: AppTextStyles.bookingFormTextInput_Hint.color!,
-                              fontSize: AppTextStyles.bookingFormTextInput_Hint.fontSize!,
-                              fontFamily: AppTextStyles.bookingFormTextInput_Hint.fontFamily!,
-                              lineHeight: 1,
-                              align: TextAlign.start,
+                        field_widget = Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            DropdownButton(
+                              value: field_options_selected[field.field_key] == null ? null : field_options_selected[field.field_key]!,
+                              icon: const Icon(Icons.keyboard_arrow_down),
+                              dropdownColor: AppColors.yellowPrimary,
+
+                              hint: StandardText(
+                                text: FlutterI18n.translate(context, "form_hint_select_option"),
+                                colorText: AppTextStyles.bookingFormTextInput_Hint.color!,
+                                fontSize: AppTextStyles.bookingFormTextInput_Hint.fontSize!,
+                                fontFamily: AppTextStyles.bookingFormTextInput_Hint.fontFamily!,
+                                lineHeight: 1,
+                                align: TextAlign.start,
+                              ),
+
+                              items: field.field_options!.map((FieldOption option){
+                                return DropdownMenuItem(
+                                  value: option.option_text,
+                                  child: StandardText(
+                                    text: option.option_text,
+                                    colorText: AppTextStyles.bookingFormTextInput_Label.color!,
+                                    fontSize: AppTextStyles.bookingFormTextInput_Label.fontSize!,
+                                    fontFamily: AppTextStyles.bookingFormTextInput_Label.fontFamily!,
+                                    lineHeight: 1,
+                                    align: TextAlign.start,
+                                  ),
+                                );
+                              }).toList(),
+                              onChanged: (String? newValue){
+
+                                // print("new value is " + newValue!);
+
+                                setState((){
+                                  if (field_options_selected[field.field_key] == null){
+                                    field_options_selected[field.field_key] = newValue!;
+                                  }else{
+                                    field_options_selected.update(field.field_key, (value) => newValue!);
+                                  }
+                                  // _selectedOption = newValue;
+                                });
+                              }
                             ),
 
-                            items: field.field_options!.map((FieldOption option){
-                              return DropdownMenuItem(
-                                value: option.option_value,
-                                child: StandardText(
-                                  text: option.option_text,
-                                  colorText: AppTextStyles.bookingFormTextInput_Label.color!,
-                                  fontSize: AppTextStyles.bookingFormTextInput_Label.fontSize!,
-                                  fontFamily: AppTextStyles.bookingFormTextInput_Label.fontFamily!,
-                                  lineHeight: 1,
-                                  align: TextAlign.start,
-                                ),
-                              );
-                            }).toList(),
-                            onChanged: (String? newValue){
-                              super.setState((){
-                                _selectedOption = newValue!;
-                              });
-                            }
+                            // Error message if validation is wrong
+                            validations[field.field_key] == false ?
+                              StandardText(
+                                colorText: AppTextStyles.bookingFormOptionErrorMsg.color!,
+                                text: FlutterI18n.translate(context, "form_hint_select_option"),
+                                fontSize: AppTextStyles.bookingFormOptionErrorMsg.fontSize!,
+                                fontFamily: AppTextStyles.bookingFormOptionErrorMsg.fontFamily!,
+                                lineHeight: 1,
+                                align: TextAlign.start
+                              ) :
+                              SizedBox.shrink(),
 
+                          ],
+                        );
+                        break;
+
+                      case Field.FIELD_TYPE_DATE:
+                        field_widget = DateTimeField(
+                          format: DateFormat('dd/MM/yyyy'),
+                          onShowPicker: (context, currentValue) async {
+                            return showDatePicker(
+                              context: context,
+                              initialDate: currentValue ?? DateTime.now(),
+                              firstDate: DateTime(1900),
+                              lastDate: DateTime(2100),
+                              builder: (context, child) {
+                                return Theme(
+                                  data: Theme.of(context).copyWith(
+                                    colorScheme: const ColorScheme.light(
+                                      primary: AppColors.blackBackGround,
+                                      onPrimary: AppColors.yellowPrimary,
+                                      onSurface: AppColors.yellowPrimary,
+                                    ),
+                                    textButtonTheme: TextButtonThemeData(
+                                      style: TextButton.styleFrom(
+                                        primary: AppColors.yellowPrimary,
+                                      ),
+
+                                    ),
+                                  ),
+                                  child: child!,
+                                );
+                              },
+                            );
+                          },
+                          validator: (date) {
+                            if ((date == null) && field.field_required) {
+                              return FlutterI18n.translate(context, "form_error_empty_date");
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            labelText: field.field_required ? field.field_text + " *" : field.field_text,
+                            labelStyle: AppTextStyles.bookingFormTextInput_Title,
+                            enabledBorder: const UnderlineInputBorder(
+                              borderSide: BorderSide(color: AppColors.whiteText),
+                            ),
+                            focusedBorder: const UnderlineInputBorder(
+                              borderSide: BorderSide(color: AppColors.yellowPrimary),
+                            ),
+                          ),
+                          style: AppTextStyles.bookingFormTextInput_Label,
                         );
                         break;
 
@@ -657,8 +732,50 @@ class CalendarWidgetState extends State<CalendarWidget>{
                     colorText: AppColors.white, align: TextAlign.center, lineHeight: 1,
                   ),
                   onPressed: (){
+                    bool all_validations = true;
+                    // Manual validations
+                    for (int i = 0; i < manual_validate_fields.length; i++){
+                      // Check every field that has to be validated manually
+                      Field field = manual_validate_fields[i];
+                      if (field.field_required){
+                        setState((){
+                          // there is no option selected (ERROR)
+                          if (field_options_selected[field.field_key] == null){
+                            all_validations &= false; // not all validations are ok
+                            validations.update(field.field_key, (value) => false);
+                            print("Validation <" + field.field_key + "> failed.");
+                            /* if (validations[field.field_key] == null){
+                                validations[field.field_key] = false;
+                              }else{
+                                validations.update(field.field_key, (value) => false);
+                              } */
+                          }
+                          // option is selected (OK)
+                          else{
+                            validations.update(field.field_key, (value) => true);
+                            /* if (validations[field.field_key] == null){
+                                validations[field.field_key] = true;
+                              }else{
+                                validations.update(field.field_key, (value) => true);
+                              } */
+                          }
+                        });
+                      }
+                    }
+
+                    // From auto validation
                     if (_formKey.currentState!.validate()){
-                      print("Form data is OK");
+
+                      // All validations ok?
+                      if (all_validations){
+                        print("Form data is OK");
+                        // TODO: NEXT PHASE
+                      }
+                      else{
+                        print("Form data is not OK");
+
+                      }
+
                     }else{
                       print("Form data is not OK");
                     }

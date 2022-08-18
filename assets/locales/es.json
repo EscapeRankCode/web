@@ -289,5 +289,7 @@
   "times_empty": "No hay horas disponibles para el día seleccionado",
   "form_error_empty_text": "Por favor, introduzca algún valor",
   "form_error_cehck_not_checked": "Por favor, marque esta casilla",
-  "form_hint_select_option": "Por favor, seleccione una opción"
+  "form_hint_select_option": "Por favor, seleccione una opción",
+  "form_error_date_format": "Error en el formato de fecha",
+  "form_error_empty_date": "Por favor, seleccione alguna fecha"
 }
