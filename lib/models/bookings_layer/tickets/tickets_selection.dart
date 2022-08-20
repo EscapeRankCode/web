@@ -18,7 +18,9 @@ class TicketsSelection{
   );
 
   factory TicketsSelection.fromJson(Map<String, dynamic> json){
+    print("Json in SELECTED TICKETS: " + json.toString());
     List<Ticket> ticketsList = [];
+
     if (json["selected_tickets"] != null){
       var ticketsFromJson = json["selected_tickets"] as List;
       ticketsList = ticketsFromJson.map((i) => Ticket.fromJson(i)).toList();

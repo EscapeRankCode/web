@@ -26,6 +26,10 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState>{
       yield* _mapGetFormToState(event);
     }
 
+    if (event is BookingFirstStep){
+      yield* _mapBookingFirstStepToState(event);
+    }
+
     yield CalendarLoadedFailure(error: "error_get_calendar");
   }
   

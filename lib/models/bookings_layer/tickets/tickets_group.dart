@@ -20,8 +20,12 @@ class TicketsGroup{
       ticketsList = ticketsFromJson.map((i) => Ticket.fromJson(i)).toList();
     }
 
+    print("TOTAL RULES:");
+    print(json["total_rules"]);
     TotalRules totalRulesFromJson = TotalRules.fromJson(json["total_rules"]);
-    TicketsSelection ticketsSelectionFromJson = TicketsSelection.fromJson(json['selected_tickets']);
+    print("TICKETS SELECTION:");
+    print(json["tickets_selection"]);
+    TicketsSelection ticketsSelectionFromJson = TicketsSelection.fromJson(json['tickets_selection']);
 
 
     return TicketsGroup(

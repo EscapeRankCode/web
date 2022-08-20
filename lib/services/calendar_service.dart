@@ -228,7 +228,7 @@ class CalendarService{
 
     request.body = request_body;
 
-    // print("FORM BODY: " + request_body);
+    // print("BOOKING STEP 1 BODY: " + request_body);
 
     http.StreamedResponse response = await request.send();
 
