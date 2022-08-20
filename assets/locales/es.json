@@ -291,5 +291,7 @@
   "form_error_cehck_not_checked": "Por favor, marque esta casilla",
   "form_hint_select_option": "Por favor, seleccione una opción",
   "form_error_date_format": "Error en el formato de fecha",
-  "form_error_empty_date": "Por favor, seleccione alguna fecha"
+  "form_error_empty_date": "Por favor, seleccione alguna fecha",
+  "booking_resume": "Resumen de la reserva",
+  "payment_title": "Pago de la reserva"
 }

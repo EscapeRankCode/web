@@ -199,5 +199,20 @@ class AppTextStyles{
       fontFamily: "Montserrat_Regular"
   );
 
+  // Booking resume
+  static const TextStyle bookingResumeTitle = TextStyle(
+      color: AppColors.whiteText,
+      fontSize: 15,
+      fontWeight: FontWeight.bold,
+      fontFamily: "Montserrat_Bold"
+  );
+
+  // Payment
+  static const TextStyle paymentTitle = TextStyle(
+      color: AppColors.whiteText,
+      fontSize: 15,
+      fontWeight: FontWeight.bold,
+      fontFamily: "Montserrat_Bold"
+  );
 
 }

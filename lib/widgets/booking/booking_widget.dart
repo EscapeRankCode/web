@@ -121,8 +121,12 @@ class CalendarWidgetState extends State<CalendarWidget>{
   Map<String, String> field_options_selected = {}; // where key is field_key
   List<Field> manual_validate_fields = [];
   Map<String, bool> validations = {};
+  bool _is_button_disabled = false;
 
-  BookingFirstStepData? bookingFirstStepData;
+  // PHASE 4
+  BookingFirstStepData? _bookingFirstStepData;
+  bool _payment_fields_checked = false;
+  bool _payment_confirmed = false;
 
 
   int _phase = 1;
@@ -149,7 +153,13 @@ class CalendarWidgetState extends State<CalendarWidget>{
       heightCalendar = month.weekday >= 6 ? 340 : 290;
     });
 
+    // PHASE 3
     enable_step_phase_3 = false;
+    // PHASE 4
+    _is_button_disabled = false;
+    // PHASE 5
+    _payment_confirmed = false;
+    _payment_fields_checked = false;
 
   }
 
@@ -201,6 +211,14 @@ class CalendarWidgetState extends State<CalendarWidget>{
           event_fields: _formData!.fields
         )
     );
+  }
+
+  void _book_second_step(){
+    // TODO: SECOND STEP IN BOOKING PROCESS
+    print("Second step in booking process");
+    setState((){
+      _phase = 6;
+    });
   }
 
   @override
@@ -813,7 +831,6 @@ class CalendarWidgetState extends State<CalendarWidget>{
 
               const SizedBox(height: 20),
 
-              true ? // enable_step_phase_4 ?
               StandardButton(
                   colorButton: enable_step_phase_3 ? AppColors.yellowPrimary : AppColors.primaryYellow30,
                   standardText: StandardText(
@@ -860,8 +877,7 @@ class CalendarWidgetState extends State<CalendarWidget>{
                       // All validations ok?
                       if (all_validations){
                         print("Form data is OK, sending data to pre-book");
-                        // NEXT PHASE
-                        _book_first_step(); // SEND THE DATA TO MAKE THE BOOKING
+                        // NEXT PHASE (Resumen de la reserva para confirmar)
                         setState((){
                           _phase = 4;
                         });
@@ -876,15 +892,6 @@ class CalendarWidgetState extends State<CalendarWidget>{
                       print("Form data is not OK");
                     }
                   }
-              ) :
-              StandardDisabledButton(
-                colorButton: enable_step_phase_3 ? AppColors.yellowPrimary : AppColors.primaryYellow30,
-                standardText: StandardText(
-                  text: FlutterI18n.translate(context, "next"),
-                  fontFamily: "Kanit_Medium",
-                  fontSize: 18,
-                  colorText: AppColors.white, align: TextAlign.center, lineHeight: 1,
-                ),
               )
 
             ],
@@ -893,6 +900,65 @@ class CalendarWidgetState extends State<CalendarWidget>{
       ],
     );
 
+    var _booking_phase_4 = Column(
+      children: [
+        StandardText(
+            colorText: AppTextStyles.bookingResumeTitle.color!,
+            text: FlutterI18n.translate(context, "booking_resume"),
+            fontSize: AppTextStyles.bookingResumeTitle.fontSize!,
+            fontFamily: AppTextStyles.bookingResumeTitle.fontFamily!,
+            lineHeight: 1,
+            align: TextAlign.start
+        ),
+        const SizedBox(height: 30),
+        StandardButton(
+            colorButton: !_is_button_disabled ? AppColors.yellowPrimary : AppColors.primaryYellow30,
+            standardText: StandardText(
+              text: FlutterI18n.translate(context, "next"),
+              fontFamily: "Kanit_Medium",
+              fontSize: 18,
+              colorText: AppColors.white, align: TextAlign.center, lineHeight: 1,
+            ),
+            onPressed: (){
+              if (!_is_button_disabled){
+                _is_button_disabled = true;
+                _book_first_step(); // SEND THE DATA TO MAKE THE BOOKING
+              }
+
+            }
+        )
+      ],
+    ); // RESUMEN DE RESERVA
+
+    var _booking_phase_5 = Column( // PAGO DE LA RESERVA
+      children: [
+        StandardText(
+            colorText: AppTextStyles.paymentTitle.color!,
+            text: FlutterI18n.translate(context, "payment_title"),
+            fontSize: AppTextStyles.paymentTitle.fontSize!,
+            fontFamily: AppTextStyles.paymentTitle.fontFamily!,
+            lineHeight: 1,
+            align: TextAlign.start
+        ),
+        const SizedBox(height: 30),
+        StandardButton(
+            colorButton: _payment_fields_checked ? AppColors.yellowPrimary : AppColors.primaryYellow30,
+            standardText: StandardText(
+              text: FlutterI18n.translate(context, "pay_and_finish_booking"),
+              fontFamily: "Kanit_Medium",
+              fontSize: 18,
+              colorText: AppColors.white, align: TextAlign.center, lineHeight: 1,
+            ),
+            onPressed: (){
+              _payment_fields_checked = true; // TODO: REMOVE, TESTING ONLY
+              if (_payment_fields_checked){
+                _book_second_step(); // SEND THE DATA TO MAKE THE BOOKING (SECOND STEP)
+              }
+
+            }
+        )
+      ],
+    );
 
     return BlocListener<CalendarBloc, CalendarState>(listener: (context, state) {
 
@@ -987,6 +1053,45 @@ class CalendarWidgetState extends State<CalendarWidget>{
       }
 
       // PHASE 4 ------
+      if (state is CalendarBookingFirstStepLoading){
+        print("Booking First Step Loading");
+      }
+
+      if (state is CalendarBookingFirstStepLoadedSuccess){
+        print("BOOKING FIRST STEP DATA RECEIVED!");
+        print(state.bookingFirstStepResponse.toJsonString());
+        _bookingFirstStepData = state.bookingFirstStepResponse.data;
+
+        _is_button_disabled = false;
+
+        if (_bookingFirstStepData == null || !_bookingFirstStepData!.pre_booked){
+          showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              title: const Text("Alert Dialog Box"),
+              content: const Text("You have raised a Alert Dialog Box"),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(ctx).pop();
+                  },
+                  child: Container(
+                    color: Colors.green,
+                    padding: const EdgeInsets.all(14),
+                    child: const Text("okay"),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+        else{
+          setState((){
+            _phase = 5;
+          });
+        }
+
+      }
 
     } , child: BlocBuilder<CalendarBloc, CalendarState>(builder: (context, state) {
       return SizedBox(
@@ -1169,7 +1274,9 @@ class CalendarWidgetState extends State<CalendarWidget>{
           child: _phase == 0 ? _booking_phase_0 :
           _phase == 1 ? _booking_phase_1 :
           _phase == 2 ? _booking_phase_2 :
-          _phase == 3 ? _booking_phase_3 : Text("Phase X"),
+          _phase == 3 ? _booking_phase_3 :
+          _phase == 4 ? _booking_phase_4 :
+          _phase == 5 ? _booking_phase_5 : Text("PHASE X")
         )
       );
 
