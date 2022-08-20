@@ -21,11 +21,13 @@ class TicketsGroup{
     }
 
     TotalRules totalRulesFromJson = TotalRules.fromJson(json["total_rules"]);
+    TicketsSelection ticketsSelectionFromJson = TicketsSelection.fromJson(json['selected_tickets']);
+
 
     return TicketsGroup(
       tickets: ticketsList,
       total_rules: totalRulesFromJson,
-      tickets_selection: TicketsSelection()
+      tickets_selection: ticketsSelectionFromJson
     );
 
   }

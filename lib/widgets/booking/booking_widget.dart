@@ -8,12 +8,14 @@ import 'package:flutter_calendar_carousel/classes/event.dart';
 import 'package:flutter_escaperank_web/bloc/bookings_layer/calendar/calendar_bloc.dart';
 import 'package:flutter_escaperank_web/bloc/bookings_layer/calendar/calendar_event.dart';
 import 'package:flutter_escaperank_web/bloc/bookings_layer/calendar/calendar_state.dart';
+import 'package:flutter_escaperank_web/models/bookings_layer/booking/booking_first_step_data.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/calendar/calendar_day.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/calendar/calendar_general.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/calendar/calendar_simple_event.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/form/event_form_data.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/form/field.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/form/field_option.dart';
+import 'package:flutter_escaperank_web/models/bookings_layer/form/user_input.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/tickets/ticket.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/tickets/tickets_group.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/tickets/tickets_selection.dart';
@@ -120,6 +122,8 @@ class CalendarWidgetState extends State<CalendarWidget>{
   List<Field> manual_validate_fields = [];
   Map<String, bool> validations = {};
 
+  BookingFirstStepData? bookingFirstStepData;
+
 
   int _phase = 1;
 
@@ -182,6 +186,20 @@ class CalendarWidgetState extends State<CalendarWidget>{
           event_id: selectedSlot!.event.eventId,
           event_tickets: eventTicketsGroups!
       )
+    );
+  }
+
+  void _book_first_step(){
+    _calendarBloc.add(
+        BookingFirstStep(
+          booking_system_id: widget.escapeRoom.bookingSystemId!,
+          bs_config: widget.escapeRoom.bsConfigId!,
+          event_date: DateFormat('dd/MM/yyyy').format(_currentDate2),
+          event_time: selectedSlot!.event.time,
+          event_id: selectedSlot!.event.eventId,
+          event_tickets: eventTicketsGroups!,
+          event_fields: _formData!.fields
+        )
     );
   }
 
@@ -521,6 +539,19 @@ class CalendarWidgetState extends State<CalendarWidget>{
                             linkStyle: AppTextStyles.bookingFormTextInput_Title,
                           ),
                           validator: (value){
+                            if (field.user_input == null){
+                              field.user_input = UserInput(
+                                user_input_text: field.field_text,
+                                user_input_value: field.field_text,
+                                user_input_others_map: {
+                                  "checked": value
+                                }
+                              );
+                            }else{
+                              field.user_input!.user_input_others_map = {
+                                "checked": value
+                              };
+                            }
                             if (field.field_required && !value!){
                               return FlutterI18n.translate(context, "form_error_cehck_not_checked");
                             }
@@ -548,6 +579,15 @@ class CalendarWidgetState extends State<CalendarWidget>{
                           style: AppTextStyles.bookingFormTextInput_Label,
                           // Validator
                           validator: (value) {
+                            if (field.user_input == null){
+                              field.user_input = UserInput(
+                                  user_input_text: field.field_text,
+                                  user_input_value: value!,
+                                  user_input_others_map: {}
+                              );
+                            }else{
+                              field.user_input!.user_input_value = value!;
+                            }
                             if ((value == null || value.isEmpty) && field.field_required) {
                               return FlutterI18n.translate(context, "form_error_empty_text");
                             }
@@ -579,6 +619,15 @@ class CalendarWidgetState extends State<CalendarWidget>{
                           style: AppTextStyles.bookingFormTextInput_Label,
                           // Validator
                           validator: (value) {
+                            if (field.user_input == null){
+                              field.user_input = UserInput(
+                                  user_input_text: field.field_text,
+                                  user_input_value: value!,
+                                  user_input_others_map: {}
+                              );
+                            }else{
+                              field.user_input!.user_input_value = value!;
+                            }
                             if ((value == null || value.isEmpty) && field.field_required) {
                               return FlutterI18n.translate(context, "form_error_empty_text");
                             }
@@ -627,7 +676,39 @@ class CalendarWidgetState extends State<CalendarWidget>{
                               }).toList(),
                               onChanged: (String? newValue){
 
-                                // print("new value is " + newValue!);
+                                List<FieldOption> options = field.field_options!;
+                                FieldOption? option_selected = null;
+                                for (int i = 0; i < options.length; i++){
+                                  if (options[i].option_text == newValue){
+                                    option_selected = options[i];
+                                    break;
+                                  }
+                                }
+                                if (field.user_input == null){
+                                  field.user_input = UserInput(
+                                      user_input_text: field.field_text,
+                                      user_input_value: field.field_text,
+                                      user_input_others_map: option_selected == null ?
+                                      {
+                                        "option_selected_text": null,
+                                        "option_selected_value": null
+                                      } :
+                                      {
+                                        "option_selected_text": option_selected.option_text,
+                                        "option_selected_value": option_selected.option_value
+                                      }
+                                  );
+                                }else{
+                                  field.user_input!.user_input_others_map = option_selected == null ?
+                                  {
+                                    "option_selected_text": null,
+                                    "option_selected_value": null
+                                  } :
+                                  {
+                                    "option_selected_text": option_selected.option_text,
+                                    "option_selected_value": option_selected.option_value
+                                  };
+                                }
 
                                 setState((){
                                   if (field_options_selected[field.field_key] == null){
@@ -686,7 +767,17 @@ class CalendarWidgetState extends State<CalendarWidget>{
                             );
                           },
                           validator: (date) {
-                            if ((date == null) && field.field_required) {
+                            final DateFormat formatter = DateFormat('dd/MM/yyyy');
+                            if (field.user_input == null){
+                              field.user_input = UserInput(
+                                  user_input_text: field.field_text,
+                                  user_input_value: formatter.format(date!),
+                                  user_input_others_map: {}
+                              );
+                            }else{
+                              field.user_input!.user_input_value = formatter.format(date!);
+                            }
+                            if (date == null && field.field_required) {
                               return FlutterI18n.translate(context, "form_error_empty_date");
                             }
                             return null;
@@ -768,8 +859,13 @@ class CalendarWidgetState extends State<CalendarWidget>{
 
                       // All validations ok?
                       if (all_validations){
-                        print("Form data is OK");
-                        // TODO: NEXT PHASE
+                        print("Form data is OK, sending data to pre-book");
+                        // NEXT PHASE
+                        _book_first_step(); // SEND THE DATA TO MAKE THE BOOKING
+                        setState((){
+                          _phase = 4;
+                        });
+
                       }
                       else{
                         print("Form data is not OK");

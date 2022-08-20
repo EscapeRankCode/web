@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:flutter_escaperank_web/models/bookings_layer/form/field_option.dart';
+import 'package:flutter_escaperank_web/models/bookings_layer/form/user_input.dart';
 
 class Field{
 
@@ -18,6 +19,7 @@ class Field{
   final String field_text;
   final String field_default_value;
   final List<FieldOption>? field_options;
+  UserInput? user_input;
 
   Field(
     {
@@ -27,6 +29,7 @@ class Field{
       required this.field_text,
       required this.field_default_value,
       required this.field_options,
+      required this.user_input
     }
   );
 
@@ -40,13 +43,19 @@ class Field{
       field_options = fieldOptionsFromJson.map((i) => FieldOption.fromJson(i)).toList();
     }
 
+    UserInput? user_input_json;
+    if (json["user_input"] != null){
+      user_input_json = UserInput.fromJson(json["user_input"]);
+    }
+
     return Field(
         field_type: json["field_type"],
         field_required: json["field_required"],
         field_key: json["field_key"],
         field_text: json["field_text"],
         field_default_value: json["field_default_value"],
-        field_options: field_options
+        field_options: field_options,
+        user_input: user_input_json
     );
   }
 
@@ -56,7 +65,8 @@ class Field{
     'field_key': field_key,
     'field_text': field_text,
     'field_default_value': field_default_value,
-    'field_options': jsonEncode(field_options)
+    'field_options': jsonEncode(field_options),
+    'user_input': jsonEncode(user_input)
   };
   
 }

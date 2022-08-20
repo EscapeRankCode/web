@@ -1,6 +1,7 @@
 
 
 import 'package:equatable/equatable.dart';
+import 'package:flutter_escaperank_web/models/bookings_layer/booking/booking_first_step_response.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/calendar/calendar_response.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/form/event_form_response.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/tickets/event_tickets_response.dart';
@@ -55,4 +56,18 @@ class CalendarEventFormLoadedSuccess extends CalendarState{
 class CalendarEventFormLoadedFailure extends CalendarState{
   final String error;
   CalendarEventFormLoadedFailure({required this.error});
+}
+
+// BOOKING STEP 1
+class CalendarBookingFirstStepLoading extends CalendarState{}
+
+class CalendarBookingFirstStepLoadedSuccess extends CalendarState{
+  final BookingFirstStepResponse bookingFirstStepResponse;
+
+  CalendarBookingFirstStepLoadedSuccess({required this.bookingFirstStepResponse});
+}
+
+class CalendarBookingFirstStepLoadedFailure extends CalendarState{
+  final String error;
+  CalendarBookingFirstStepLoadedFailure({required this.error});
 }

@@ -34,6 +34,7 @@ class TicketsGroupWidget extends StatelessWidget{
                     if (!pressed){
                       ticketsGroup.tickets_selection.check_selected_units -= ticketInfoCheck.single_unit_value;
                       selection_check_function();
+                      ticketsGroup.tickets_selection.selected_tickets.remove(ticket);
                       return pressed;
                     }else{
                       int new_check_units = ticketsGroup.tickets_selection.check_selected_units + ticketInfoCheck.single_unit_value;
@@ -45,6 +46,7 @@ class TicketsGroupWidget extends StatelessWidget{
                       }
                       ticketsGroup.tickets_selection.check_selected_units = new_check_units;
                       selection_check_function();
+                      ticketsGroup.tickets_selection.selected_tickets.add(ticket);
                       return pressed;
                     }
                   },
@@ -80,6 +82,15 @@ class TicketsGroupWidget extends StatelessWidget{
                       return prev_value;
                     }else{
                       ticketsGroup.tickets_selection.counter_selected_units = new_counter_units;
+                      if (new_counter_units > 0){
+                        if (!ticketsGroup.tickets_selection.selected_tickets.contains(ticket)){
+                          ticketsGroup.tickets_selection.selected_tickets.add(ticket);
+                        }
+                      }else{
+                        if (ticketsGroup.tickets_selection.selected_tickets.contains(ticket)){
+                          ticketsGroup.tickets_selection.selected_tickets.remove(ticket);
+                        }
+                      }
                       print("All OK new counter units");
                       selection_check_function();
                       return next_value;
@@ -92,8 +103,6 @@ class TicketsGroupWidget extends StatelessWidget{
                   )
               ),
             );
-
-            return Text("Ticket counter " + index.toString());
           }break;
 
           case Ticket.OPTION: {
@@ -126,6 +135,15 @@ class TicketsGroupWidget extends StatelessWidget{
                     ticketsGroup.tickets_selection.option_selected_units = new_option_units;
                     print("All OK new option units");
                     selection_check_function();
+                    if (new_option_units > 0){
+                      if (!ticketsGroup.tickets_selection.selected_tickets.contains(ticket)){
+                        ticketsGroup.tickets_selection.selected_tickets.add(ticket);
+                      }
+                    }else{
+                      if (ticketsGroup.tickets_selection.selected_tickets.contains(ticket)){
+                        ticketsGroup.tickets_selection.selected_tickets.remove(ticket);
+                      }
+                    }
                     return pressed;
                   }
 

@@ -71,4 +71,5 @@ class BookingsLayerApi{
   static const getCalendarAvailability = '/api/bookings_layer/calendar_availability';
   static const getEventTickets = '/api/bookings_layer/event_tickets';
   static const getEventForm = '/api/bookings_layer/event_form';
+  static const booking_first_step = '/api/bookings_layer/book_first_step';
 }
