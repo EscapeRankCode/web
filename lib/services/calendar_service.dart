@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_escaperank_web/models/bookings_layer/booking/booking_first_step_response.dart';
+import 'package:flutter_escaperank_web/models/bookings_layer/booking/booking_second_step_response.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/form/event_form_response.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/form/field.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/tickets/event_tickets_response.dart';
@@ -248,5 +249,67 @@ class CalendarService{
     }
 
   }
+
+  // booking_second_step
+  /// Makes a call to the back end to pre book the slot
+  /// Paramenters:
+  ///   [booking_system_id] id of the BS
+  ///   [bs_config] id of the BS Config
+  ///   [event_date] date in format dd/mm/yyyy
+  ///   [event_time] time in format hh:mm
+  ///   [event_id] id of the event
+  ///   [event_tickets] all groups of the tickets that have been selected
+  ///   [event_fields] all fields and its user input inside
+  ///   [booking_info] map with bs specific booking info (from step 1)
+  ///
+  Future<BookingSecondStepResponse?> booking_second_step(int booking_system_id, int bs_config, String event_date, String event_time, String event_id, List<TicketsGroup> event_tickets, List<Field> event_fields, Map<String, dynamic> booking_info) async {
+
+    var headers = {
+      'ApiKey': API.apiKey,
+      'accept': 'application/json',
+      'Authorization': CalendarService.BEARER, // TODO: REMOVE THE BEARER
+    };
+
+    String url = 'http://' + Config.BASE_URL + BookingsLayerApi.booking_second_step;
+
+    var request = http.Request('POST', Uri.parse(url));
+
+
+    request.headers.addAll(headers);
+
+    var request_body = json.encode({
+      "booking_system_id": booking_system_id,
+      "bs_config": bs_config,
+      "event_date": event_date,
+      "event_time": event_time,
+      "event_id": event_id,
+      "event_tickets": jsonEncode(event_tickets),
+      "event_fields": jsonEncode(event_fields),
+      "booking_info": jsonEncode(booking_info)
+    });
+
+    request.body = request_body;
+
+    print("BOOKING STEP 2 BODY: " + request_body);
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      print("--- Response is status 200");
+      String res = await response.stream.bytesToString();
+      print("response is : " + res);
+      // Map<String, dynamic> json_map = json.decode(res);
+      dynamic json_map = json.decode(res);
+      // print("BOOK FIRST STEP RESULT BODY: " + json_map.toString());
+      return BookingSecondStepResponse.fromJson(json_map);
+    }
+    else {
+      print("--- Response is not status 200");
+      print(response);
+      return null;
+    }
+
+  }
+
 
 }

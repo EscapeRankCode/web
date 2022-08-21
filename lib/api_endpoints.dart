@@ -72,4 +72,6 @@ class BookingsLayerApi{
   static const getEventTickets = '/api/bookings_layer/event_tickets';
   static const getEventForm = '/api/bookings_layer/event_form';
   static const booking_first_step = '/api/bookings_layer/book_first_step';
+  static const booking_second_step = '/api/bookings_layer/book_second_step';
+
 }

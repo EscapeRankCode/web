@@ -30,6 +30,11 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState>{
       yield* _mapBookingFirstStepToState(event);
     }
 
+    if (event is BookingSecondStep){
+      yield* _mapBookingSecondStepToState(event);
+    }
+
+    // TODO: REMOVE THIS yield (POR ESO SIEMPRE MUESTRA ERROR)
     yield CalendarLoadedFailure(error: "error_get_calendar");
   }
   
@@ -108,11 +113,35 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState>{
 
       }else{
         print("BOOKING FIRST STEP --- FAILURE!");
-        yield CalendarBookingFirstStepLoadedFailure(error: "error_get_form");
+        yield CalendarBookingFirstStepLoadedFailure(error: "error_first_step");
       }
 
     }catch(err){
-      yield CalendarBookingFirstStepLoadedFailure(error: "error_get_form");
+      yield CalendarBookingFirstStepLoadedFailure(error: "error_first_step");
+    }
+
+  }
+
+
+  Stream<CalendarState> _mapBookingSecondStepToState(BookingSecondStep event) async*{
+
+    yield CalendarBookingSecondStepLoading();
+
+    try{
+
+      var second_step_result = await _calendarService.booking_second_step(event.booking_system_id, event.bs_config, event.event_date, event.event_time, event.event_id, event.event_tickets, event.event_fields, event.booking_info);
+
+      if (second_step_result != null){
+        print("BOOKING SECOND STEP --- SUCCESS!");
+        yield CalendarBookingSecondStepLoadedSuccess(bookingSecondStepResponse: second_step_result);
+
+      }else{
+        print("BOOKING SECOND STEP --- FAILURE!");
+        yield CalendarBookingSecondStepLoadedFailure(error: "error_second_step");
+      }
+
+    }catch(err){
+      yield CalendarBookingSecondStepLoadedFailure(error: "error_second_step");
     }
 
   }

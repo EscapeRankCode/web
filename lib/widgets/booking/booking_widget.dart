@@ -9,6 +9,7 @@ import 'package:flutter_escaperank_web/bloc/bookings_layer/calendar/calendar_blo
 import 'package:flutter_escaperank_web/bloc/bookings_layer/calendar/calendar_event.dart';
 import 'package:flutter_escaperank_web/bloc/bookings_layer/calendar/calendar_state.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/booking/booking_first_step_data.dart';
+import 'package:flutter_escaperank_web/models/bookings_layer/booking/booking_second_step_data.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/calendar/calendar_day.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/calendar/calendar_general.dart';
 import 'package:flutter_escaperank_web/models/bookings_layer/calendar/calendar_simple_event.dart';
@@ -128,6 +129,10 @@ class CalendarWidgetState extends State<CalendarWidget>{
   bool _payment_fields_checked = false;
   bool _payment_confirmed = false;
 
+  // PHASE 5
+  BookingSecondStepData? _bookingSecondStepData;
+  bool _see_confirmation = false;
+
 
   int _phase = 1;
 
@@ -214,11 +219,20 @@ class CalendarWidgetState extends State<CalendarWidget>{
   }
 
   void _book_second_step(){
+    _calendarBloc.add(
+        BookingSecondStep(
+            booking_system_id: widget.escapeRoom.bookingSystemId!,
+            bs_config: widget.escapeRoom.bsConfigId!,
+            event_date: DateFormat('dd/MM/yyyy').format(_currentDate2),
+            event_time: selectedSlot!.event.time,
+            event_id: selectedSlot!.event.eventId,
+            event_tickets: eventTicketsGroups!,
+            event_fields: _formData!.fields,
+            booking_info: _bookingFirstStepData!.booking_info
+        )
+    );
     // TODO: SECOND STEP IN BOOKING PROCESS
     print("Second step in booking process");
-    setState((){
-      _phase = 6;
-    });
   }
 
   @override
@@ -960,6 +974,12 @@ class CalendarWidgetState extends State<CalendarWidget>{
       ],
     );
 
+    var _booking_phase_6 = Column(
+      children: [
+        const Text("PHASE 6")
+      ],
+    );
+
     return BlocListener<CalendarBloc, CalendarState>(listener: (context, state) {
 
       // PHASE 1 -------
@@ -1091,6 +1111,37 @@ class CalendarWidgetState extends State<CalendarWidget>{
           });
         }
 
+      }
+
+      if (state is CalendarBookingFirstStepLoadedFailure){
+        _is_button_disabled = false;
+        print("Booking First Step Failure");
+      }
+
+      // PHASE 5 -------
+      if (state is CalendarBookingSecondStepLoading){
+        print("Booking Second Step Loading");
+      }
+
+      if (state is CalendarBookingSecondStepLoadedSuccess){
+        _bookingSecondStepData = state.bookingSecondStepResponse.data;
+        // able the button to see the confirmation if booking is confirmed
+        if (_bookingSecondStepData == null){
+          // TODO: ERROR, show dialog
+        }else{
+          if (_bookingSecondStepData!.booked){
+            setState((){
+              _phase = 6; // CONFIRMATION PAGE
+            });
+          }
+          else{
+            // TODO: ERROR, show dialog
+          }
+        }
+      }
+
+      if (state is CalendarBookingSecondStepLoadedFailure){
+        print("Booking Second Step Failure");
       }
 
     } , child: BlocBuilder<CalendarBloc, CalendarState>(builder: (context, state) {
