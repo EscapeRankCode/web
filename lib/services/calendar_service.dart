@@ -228,7 +228,7 @@ class CalendarService{
 
     request.body = request_body;
 
-    // print("BOOKING STEP 1 BODY: " + request_body);
+    print("BOOKING STEP 1 BODY: " + request_body);
 
     http.StreamedResponse response = await request.send();
 
@@ -236,12 +236,14 @@ class CalendarService{
       print("--- Response is status 200");
       String res = await response.stream.bytesToString();
       print("response is : " + res);
-      Map<String, dynamic> json_map = json.decode(res);
-      print("BOOK FIRST STEP RESULT BODY: " + json_map.toString());
+      // Map<String, dynamic> json_map = json.decode(res);
+      dynamic json_map = json.decode(res);
+      // print("BOOK FIRST STEP RESULT BODY: " + json_map.toString());
       return BookingFirstStepResponse.fromJson(json_map);
     }
     else {
       print("--- Response is not status 200");
+      print(response);
       return null;
     }
 

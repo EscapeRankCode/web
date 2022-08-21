@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class BookingFirstStepData{
   final bool pre_booked;
   final String error;
@@ -15,14 +17,14 @@ class BookingFirstStepData{
     required this.booking_info
   });
 
-  factory BookingFirstStepData.fromJson(Map<String, dynamic> json){
+  factory BookingFirstStepData.fromJson(Map<String, dynamic> json_object){
     return BookingFirstStepData(
-      pre_booked: json["pre_booked"],
-      error: json["error"],
-      total_price: json["total_price"],
-      deposit_price: json["deposit_price"],
-      currency: json["currency"],
-      booking_info: json["booking_info"]
+      pre_booked: json_object["pre_booked"],
+      error: json_object["error"],
+      total_price: json_object["total_price"],
+      deposit_price: json_object["deposit_price"],
+      currency: json_object["currency"],
+      booking_info: json.decode(json_object["booking_info"])
     );
   }
 
