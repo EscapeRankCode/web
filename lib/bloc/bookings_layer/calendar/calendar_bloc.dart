@@ -105,7 +105,7 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState>{
 
     try{
 
-      var first_step_result = await _calendarService.booking_first_step(event.booking_system_id, event.bs_config, event.event_date, event.event_time, event.event_id, event.event_tickets, event.event_fields);
+      var first_step_result = await _calendarService.booking_first_step(event.escaperoom_id, event.company_id, event.booking_system_id, event.bs_config, event.event_date, event.event_time, event.event_id, event.event_tickets, event.event_fields);
 
       if (first_step_result != null){
         print("BOOKING FIRST STEP --- SUCCESS!");

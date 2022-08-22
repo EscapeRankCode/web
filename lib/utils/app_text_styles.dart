@@ -215,4 +215,12 @@ class AppTextStyles{
       fontFamily: "Montserrat_Bold"
   );
 
+  // Booking Confirmation
+  static const TextStyle confirmationTitle = TextStyle(
+      color: AppColors.whiteText,
+      fontSize: 15,
+      fontWeight: FontWeight.bold,
+      fontFamily: "Montserrat_Bold"
+  );
+
 }

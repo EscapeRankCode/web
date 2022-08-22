@@ -164,7 +164,8 @@ class CalendarWidgetState extends State<CalendarWidget>{
     _is_button_disabled = false;
     // PHASE 5
     _payment_confirmed = false;
-    _payment_fields_checked = false;
+    _payment_fields_checked = true; // TODO: TESTING ONLY
+    // _payment_fields_checked = false;
 
   }
 
@@ -207,6 +208,8 @@ class CalendarWidgetState extends State<CalendarWidget>{
   void _book_first_step(){
     _calendarBloc.add(
         BookingFirstStep(
+          escaperoom_id: widget.escapeRoom.id,
+          company_id: widget.escapeRoom.companyId,
           booking_system_id: widget.escapeRoom.bookingSystemId!,
           bs_config: widget.escapeRoom.bsConfigId!,
           event_date: DateFormat('dd/MM/yyyy').format(_currentDate2),
@@ -964,8 +967,9 @@ class CalendarWidgetState extends State<CalendarWidget>{
               colorText: AppColors.white, align: TextAlign.center, lineHeight: 1,
             ),
             onPressed: (){
-              _payment_fields_checked = true; // TODO: REMOVE, TESTING ONLY
               if (_payment_fields_checked){
+                // TODO: MAKE THE PAYMENT
+                // TODO: IF PAYMENT IS CORRECT --> book_second_step()
                 _book_second_step(); // SEND THE DATA TO MAKE THE BOOKING (SECOND STEP)
               }
 
@@ -976,7 +980,15 @@ class CalendarWidgetState extends State<CalendarWidget>{
 
     var _booking_phase_6 = Column(
       children: [
-        const Text("PHASE 6")
+        const Text("PHASE 6"),
+        StandardText(
+            colorText: AppTextStyles.confirmationTitle.color!,
+            text: FlutterI18n.translate(context, "booking_confirm_title"),
+            fontSize: AppTextStyles.confirmationTitle.fontSize!,
+            fontFamily: AppTextStyles.confirmationTitle.fontFamily!,
+            lineHeight: 1,
+            align: TextAlign.start
+        ),
       ],
     );
 
@@ -1128,6 +1140,7 @@ class CalendarWidgetState extends State<CalendarWidget>{
         // able the button to see the confirmation if booking is confirmed
         if (_bookingSecondStepData == null){
           // TODO: ERROR, show dialog
+          print("second step result is null");
         }else{
           if (_bookingSecondStepData!.booked){
             setState((){
@@ -1136,6 +1149,7 @@ class CalendarWidgetState extends State<CalendarWidget>{
           }
           else{
             // TODO: ERROR, show dialog
+            print("second step returns booked = false");
           }
         }
       }
@@ -1159,7 +1173,8 @@ class CalendarWidgetState extends State<CalendarWidget>{
           _phase == 2 ? _booking_phase_2 :
           _phase == 3 ? _booking_phase_3 :
           _phase == 4 ? _booking_phase_4 :
-          _phase == 5 ? _booking_phase_5 : Text("PHASE X")
+          _phase == 5 ? _booking_phase_5 :
+          _phase == 6 ? _booking_phase_6 : Text("PHASE X")
         )
       );
 

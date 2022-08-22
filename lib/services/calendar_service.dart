@@ -202,7 +202,7 @@ class CalendarService{
   ///   [event_tickets] all groups of the tickets that have been selected
   ///   [event_fields] all fields and its user input inside
   ///
-  Future<BookingFirstStepResponse?> booking_first_step(int booking_system_id, int bs_config, String event_date, String event_time, String event_id, List<TicketsGroup> event_tickets, List<Field> event_fields) async {
+  Future<BookingFirstStepResponse?> booking_first_step(int escaperoom_id, int company_id, int booking_system_id, int bs_config, String event_date, String event_time, String event_id, List<TicketsGroup> event_tickets, List<Field> event_fields) async {
 
     var headers = {
       'ApiKey': API.apiKey,
@@ -218,6 +218,8 @@ class CalendarService{
     request.headers.addAll(headers);
 
     var request_body = json.encode({
+      "escaperoom_id": escaperoom_id,
+      "company_id": company_id,
       "booking_system_id": booking_system_id,
       "bs_config": bs_config,
       "event_date": event_date,

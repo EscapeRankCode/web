@@ -42,6 +42,8 @@ class GetForm extends CalendarEvent{
 
 class BookingFirstStep extends CalendarEvent{
   String? token;
+  final int escaperoom_id;
+  final int company_id;
   final int booking_system_id;
   final int bs_config;
   final String event_date;
@@ -50,7 +52,7 @@ class BookingFirstStep extends CalendarEvent{
   final List<TicketsGroup> event_tickets;
   final List<Field> event_fields;
 
-  BookingFirstStep({this.token, required this.booking_system_id, required this.bs_config, required this.event_date, required this.event_time, required this.event_id, required this.event_tickets, required this.event_fields});
+  BookingFirstStep({this.token, required this.escaperoom_id, required this.company_id, required this.booking_system_id, required this.bs_config, required this.event_date, required this.event_time, required this.event_id, required this.event_tickets, required this.event_fields});
 }
 
 class BookingSecondStep extends CalendarEvent{
