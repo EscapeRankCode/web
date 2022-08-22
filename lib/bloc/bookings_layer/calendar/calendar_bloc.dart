@@ -129,7 +129,7 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState>{
 
     try{
 
-      var second_step_result = await _calendarService.booking_second_step(event.booking_system_id, event.bs_config, event.event_date, event.event_time, event.event_id, event.event_tickets, event.event_fields, event.booking_info);
+      var second_step_result = await _calendarService.booking_second_step(event.escaperoom_id, event.company_id, event.booking_system_id, event.bs_config, event.event_date, event.event_time, event.event_id, event.event_tickets, event.event_fields, event.booking_info);
 
       if (second_step_result != null){
         print("BOOKING SECOND STEP --- SUCCESS!");

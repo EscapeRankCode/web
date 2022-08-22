@@ -264,7 +264,7 @@ class CalendarService{
   ///   [event_fields] all fields and its user input inside
   ///   [booking_info] map with bs specific booking info (from step 1)
   ///
-  Future<BookingSecondStepResponse?> booking_second_step(int booking_system_id, int bs_config, String event_date, String event_time, String event_id, List<TicketsGroup> event_tickets, List<Field> event_fields, Map<String, dynamic> booking_info) async {
+  Future<BookingSecondStepResponse?> booking_second_step(int escaperoom_id, int company_id, int booking_system_id, int bs_config, String event_date, String event_time, String event_id, List<TicketsGroup> event_tickets, List<Field> event_fields, Map<String, dynamic> booking_info) async {
 
     var headers = {
       'ApiKey': API.apiKey,
@@ -280,6 +280,8 @@ class CalendarService{
     request.headers.addAll(headers);
 
     var request_body = json.encode({
+      "escaperoom_id": escaperoom_id,
+      "company_id": company_id,
       "booking_system_id": booking_system_id,
       "bs_config": bs_config,
       "event_date": event_date,
@@ -302,7 +304,6 @@ class CalendarService{
       print("response is : " + res);
       // Map<String, dynamic> json_map = json.decode(res);
       dynamic json_map = json.decode(res);
-      // print("BOOK FIRST STEP RESULT BODY: " + json_map.toString());
       return BookingSecondStepResponse.fromJson(json_map);
     }
     else {

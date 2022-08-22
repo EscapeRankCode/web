@@ -224,14 +224,16 @@ class CalendarWidgetState extends State<CalendarWidget>{
   void _book_second_step(){
     _calendarBloc.add(
         BookingSecondStep(
-            booking_system_id: widget.escapeRoom.bookingSystemId!,
-            bs_config: widget.escapeRoom.bsConfigId!,
-            event_date: DateFormat('dd/MM/yyyy').format(_currentDate2),
-            event_time: selectedSlot!.event.time,
-            event_id: selectedSlot!.event.eventId,
-            event_tickets: eventTicketsGroups!,
-            event_fields: _formData!.fields,
-            booking_info: _bookingFirstStepData!.booking_info
+          escaperoom_id: widget.escapeRoom.id,
+          company_id: widget.escapeRoom.companyId,
+          booking_system_id: widget.escapeRoom.bookingSystemId!,
+          bs_config: widget.escapeRoom.bsConfigId!,
+          event_date: DateFormat('dd/MM/yyyy').format(_currentDate2),
+          event_time: selectedSlot!.event.time,
+          event_id: selectedSlot!.event.eventId,
+          event_tickets: eventTicketsGroups!,
+          event_fields: _formData!.fields,
+          booking_info: _bookingFirstStepData!.booking_info
         )
     );
     // TODO: SECOND STEP IN BOOKING PROCESS

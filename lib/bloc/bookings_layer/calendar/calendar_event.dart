@@ -57,6 +57,8 @@ class BookingFirstStep extends CalendarEvent{
 
 class BookingSecondStep extends CalendarEvent{
   String? token;
+  final int escaperoom_id;
+  final int company_id;
   final int booking_system_id;
   final int bs_config;
   final String event_date;
@@ -70,6 +72,8 @@ class BookingSecondStep extends CalendarEvent{
   BookingSecondStep(
     {
       this.token,
+      required this.escaperoom_id,
+      required this.company_id,
       required this.booking_system_id,
       required this.bs_config,
       required this.event_date,
