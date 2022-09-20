@@ -34,8 +34,8 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState>{
       yield* _mapBookingSecondStepToState(event);
     }
 
-    // TODO: REMOVE THIS yield (POR ESO SIEMPRE MUESTRA ERROR)
-    yield CalendarLoadedFailure(error: "error_get_calendar");
+    // REMOVE THIS yield (POR ESO SIEMPRE MUESTRA ERROR)
+    // yield CalendarLoadedFailure(error: "error_get_calendar");
   }
   
   Stream<CalendarState> _mapGetCalendarToState(GetCalendar event) async*{

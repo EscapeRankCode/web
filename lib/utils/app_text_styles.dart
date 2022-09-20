@@ -223,4 +223,44 @@ class AppTextStyles{
       fontFamily: "Montserrat_Bold"
   );
 
+  // Loading text
+  static const TextStyle loadingTitle = TextStyle(
+      color: AppColors.yellowPrimary,
+      fontSize: 15,
+      fontWeight: FontWeight.bold,
+      fontFamily: "Montserrat_Bold"
+  );
+
+  // Not reservable
+  static const TextStyle notReservable = TextStyle(
+      color: AppColors.whiteText,
+      fontSize: 13,
+      fontWeight: FontWeight.normal,
+      fontFamily: "Montserrat_Regular"
+  );
+
+  // Book on the web button text
+  static const TextStyle bookOnTheWeb = TextStyle(
+      color: AppColors.whiteText,
+      fontSize: 15,
+      fontWeight: FontWeight.bold,
+      fontFamily: "Montserrat_Bold"
+  );
+
+  // Not reservable
+  static const TextStyle bookingError = TextStyle(
+      color: AppColors.whiteText,
+      fontSize: 13,
+      fontWeight: FontWeight.normal,
+      fontFamily: "Montserrat_Regular"
+  );
+
+  // Book on the web button text
+  static const TextStyle tryAgain = TextStyle(
+      color: AppColors.whiteText,
+      fontSize: 15,
+      fontWeight: FontWeight.bold,
+      fontFamily: "Montserrat_Bold"
+  );
+
 }

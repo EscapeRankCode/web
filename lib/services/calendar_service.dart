@@ -51,38 +51,13 @@ class CalendarService{
       print("--- Response is status 200");
       String res = await response.stream.bytesToString();
       dynamic body = json.decode(res);
+      print("RESPONSE CALENDAR: " + res);
       return CalendarResponse.fromJson(body);
     }
     else {
       print("--- Response is not status 200");
       return null;
     }
-
-    /*
-    var jsonData = {
-      "escape_id": escape_id,
-      "start_date": start_date,
-      "end_date": end_date
-    };
-    Uri uri = Uri.https(Config.BASE_URL, BookingsLayerApi.getCalendarAvailability, jsonData);
-
-    final response = await http.get(
-      uri,
-      headers: {
-        'accept': 'application/json',
-        'Content-Type': 'application/json',
-        'ApiKey': API.apiKey,
-        'Authorization': 'Bearer xosel0l0' // TODO: REMOVE THE BEARER
-      }
-    );
-
-    if (response.statusCode == Responses.RESPONSE_OK){
-      dynamic body = json.decode(response.body);
-      return CalendarResponse.fromJson(body);
-    }
-
-    return null;
-     */
   }
 
 

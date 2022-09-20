@@ -373,7 +373,32 @@ class CalendarWidgetState extends State<CalendarWidget>{
 
     // PHASES WIDGETS
     // PHASE 0 (LOADING CALENDAR)
-    var _booking_phase_0 = Text("PHASE 0");
+    var _booking_phase_0 = Center(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 20.0),
+          child: Column(
+            children: [
+              StandardText(
+                colorText: AppTextStyles.loadingTitle.color!,
+                text: FlutterI18n.translate(context, "loading"),
+                fontSize: AppTextStyles.loadingTitle.fontSize!,
+                fontFamily: AppTextStyles.loadingTitle.fontFamily!,
+                lineHeight: 1,
+                align: TextAlign.center
+              ),
+              const SizedBox(
+                height: 16,
+              ),
+              const CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.yellowPrimary)
+              ),
+              const SizedBox(
+                height: 16,
+              ),
+            ],
+          )
+        )
+    );
     // PHASE 1 (SELECT DAY AND TIME)
     var _booking_phase_1 = Column(
       children: [
@@ -690,7 +715,7 @@ class CalendarWidgetState extends State<CalendarWidget>{
                               dropdownColor: AppColors.yellowPrimary,
 
                               hint: StandardText(
-                                text: FlutterI18n.translate(context, "form_hint_select_option"),
+                                text: field.field_text, // FlutterI18n.translate(context, "form_hint_select_option")
                                 colorText: AppTextStyles.bookingFormTextInput_Hint.color!,
                                 fontSize: AppTextStyles.bookingFormTextInput_Hint.fontSize!,
                                 fontFamily: AppTextStyles.bookingFormTextInput_Hint.fontFamily!,
@@ -994,173 +1019,282 @@ class CalendarWidgetState extends State<CalendarWidget>{
       ],
     );
 
-    return BlocListener<CalendarBloc, CalendarState>(listener: (context, state) {
+    var _book_on_the_web = Column(
+      children: [
+        const SizedBox(
+          height: 16,
+        ),
+        StandardText(
+          colorText: AppTextStyles.notReservable.color!,
+          text: FlutterI18n.translate(context, "not_reservable"),
+          fontSize: AppTextStyles.notReservable.fontSize!,
+          fontFamily: AppTextStyles.notReservable.fontFamily!,
+          lineHeight: 1,
+          align: TextAlign.center
+        ),
+        const SizedBox(
+          height: 16,
+        ),
+        SizedBox(
+          width: 300,
+          child: StandardButton(
+              colorButton: AppColors.yellowPrimary,
+              standardText: StandardText(
+                  colorText: AppTextStyles.bookOnTheWeb.color!,
+                  text: FlutterI18n.translate(context, "book_on_the_web"),
+                  fontSize: AppTextStyles.bookOnTheWeb.fontSize!,
+                  fontFamily: AppTextStyles.bookOnTheWeb.fontFamily!,
+                  lineHeight: 1,
+                  align: TextAlign.center
+              ),
+              onPressed: ((){
+                launch(widget.escapeRoom.bookingUrl);
+              })
+          ),
+        ),
+        const SizedBox(
+          height: 16,
+        )
+      ],
+    );
 
-      // PHASE 1 -------
-      if (state is CalendarLoading){
-        print("Calendar Loading state");
-        setState((){
-          _phase = 0; // Calendar is loading TODO: LOADING WIDGET
-        });
-      }
+    var error_in_any_state = Column(
+      children: [
+        const SizedBox(
+          height: 16,
+        ),
+        StandardText(
+            colorText: AppTextStyles.bookingError.color!,
+            text: FlutterI18n.translate(context, "not_reservable"),
+            fontSize: AppTextStyles.bookingError.fontSize!,
+            fontFamily: AppTextStyles.bookingError.fontFamily!,
+            lineHeight: 1,
+            align: TextAlign.center
+        ),
+        const SizedBox(
+          height: 16,
+        ),
+        SizedBox(
+          width: 300,
+          child: StandardButton(
+              colorButton: AppColors.yellowPrimary,
+              standardText: StandardText(
+                  colorText: AppTextStyles.tryAgain.color!,
+                  text: FlutterI18n.translate(context, "try_again"),
+                  fontSize: AppTextStyles.tryAgain.fontSize!,
+                  fontFamily: AppTextStyles.tryAgain.fontFamily!,
+                  lineHeight: 1,
+                  align: TextAlign.center
+              ),
+              onPressed: ((){
+                // initState();
 
-      if (state is CalendarLoadedSuccess) {
-        // timezone = state.calendarAvailability.data.calendar.timezone;
-        var days = state.calendarAvailability.data.calendar.days;
-        slotsEvents.clear();
-        slotsSelected.clear();
-        visibleCalendar = state.calendarAvailability.data.calendar;
+                setState((){
+                  loadEvents(
+                      initial_day_month,
+                      final_day_month
+                  );
+                  _phase = 0;
+                });
+              })
+          ),
+        ),
+        const SizedBox(
+          height: 16,
+        )
+      ],
+    );
 
-        // slotsEvents = state.calendarAvailability.data.calendar.days[0].events; // TODO: #Invented
-        print("Calendar Loaded Success state");
+    return widget.escapeRoom.externalId == "null" ?
+      _book_on_the_web :
+      BlocListener<CalendarBloc, CalendarState>(listener: (context, state) {
 
-        setState((){
-          _phase = 1; // Calendar has been loaded
-          checkSlots(_currentDate2);
-        });
-      }
-
-      if (state is CalendarLoadedFailure) {
-        setState((){
-          // _phase = 0; // Calendar error: TODO: how do we know what to show
-        });
-        print("Calendar Loading Failure state");
-      }
-
-      // PHASE 2 -------
-      if (state is CalendarEventTicketsLoading){
-        print("Event Tickets Loading state");
-        setState((){
-          // _phase = 0; // Event Tickets are loading TODO: LOADING WIDGET
-        });
-      }
-
-      if (state is CalendarEventTicketsLoadedSuccess){
-        print("Event Tickets Loaded Successfully");
-        setState((){
-          _phase = 2;
-          print(state.eventTickets.toJsonString());
-          eventTicketsGroups = state.eventTickets.data.tickets_groups;
-          if (eventTicketsGroups == null){
-            print("Groups is null");
-          }
-          print("Groups is not null");
-          print("Groups length: " + eventTicketsGroups!.length.toString());
-          for (int i = 0; i < eventTicketsGroups!.length; i++){
-            print("Groups " + i.toString());
-            for (int j = 0; j < eventTicketsGroups![i].tickets.length; j++){
-              print("Ticket name: " + eventTicketsGroups![i].tickets[j].ticket_name);
-            }
-          }
-        });
-      }
-
-      if (state is CalendarEventTicketsLoadedFailure){
-        print("event Tickets Loaded Failure");
-      }
-
-      // PHASE 3 -------
-      if (state is CalendarEventFormLoading){
-        print("Event Form Loading");
-      }
-
-      if (state is CalendarEventFormLoadedSuccess){
-        setState((){
-          _phase = 3;
-          // print(state.eventForm.toJsonString());
-          _formData = state.eventForm.data;
-          // eventTicketsGroups = state.eventTickets.data.tickets_groups;
-          if (_formData == null){
-            print("Form is null");
-          }
-          print("Form is not null");
-          print("Form Fields length: " + _formData!.fields.length.toString());
-          for (int i = 0; i < _formData!.fields.length; i++){
-            print("Field " + i.toString());
-            print("Field name: " + _formData!.fields[i].field_text);
-          }
-        });
-      }
-
-      if (state is CalendarEventFormLoadedFailure){
-        print("Event Form Loaded Failure");
-      }
-
-      // PHASE 4 ------
-      if (state is CalendarBookingFirstStepLoading){
-        print("Booking First Step Loading");
-      }
-
-      if (state is CalendarBookingFirstStepLoadedSuccess){
-        print("BOOKING FIRST STEP DATA RECEIVED!");
-        print(state.bookingFirstStepResponse.toJsonString());
-        _bookingFirstStepData = state.bookingFirstStepResponse.data;
-
-        _is_button_disabled = false;
-
-        if (_bookingFirstStepData == null || !_bookingFirstStepData!.pre_booked){
-          showDialog(
-            context: context,
-            builder: (ctx) => AlertDialog(
-              title: const Text("Alert Dialog Box"),
-              content: const Text("You have raised a Alert Dialog Box"),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(ctx).pop();
-                  },
-                  child: Container(
-                    color: Colors.green,
-                    padding: const EdgeInsets.all(14),
-                    child: const Text("okay"),
-                  ),
-                ),
-              ],
-            ),
-          );
-        }
-        else{
+        // PHASE 1 -------
+        if (state is CalendarLoading){
+          print("Calendar Loading state");
           setState((){
-            _phase = 5;
+            _phase = 0; // Calendar is loading TODO: LOADING WIDGET
           });
         }
 
-      }
+        if (state is CalendarLoadedSuccess) {
+          // timezone = state.calendarAvailability.data.calendar.timezone;
+          var days = state.calendarAvailability.data.calendar.days;
+          slotsEvents.clear();
+          slotsSelected.clear();
+          visibleCalendar = state.calendarAvailability.data.calendar;
 
-      if (state is CalendarBookingFirstStepLoadedFailure){
-        _is_button_disabled = false;
-        print("Booking First Step Failure");
-      }
+          // slotsEvents = state.calendarAvailability.data.calendar.days[0].events; // TODO: #Invented
+          print("Calendar Loaded Success state");
 
-      // PHASE 5 -------
-      if (state is CalendarBookingSecondStepLoading){
-        print("Booking Second Step Loading");
-      }
+          setState((){
+            _phase = 1; // Calendar has been loaded
+            checkSlots(_currentDate2);
+          });
+        }
 
-      if (state is CalendarBookingSecondStepLoadedSuccess){
-        _bookingSecondStepData = state.bookingSecondStepResponse.data;
-        // able the button to see the confirmation if booking is confirmed
-        if (_bookingSecondStepData == null){
-          // TODO: ERROR, show dialog
-          print("second step result is null");
-        }else{
-          if (_bookingSecondStepData!.booked){
-            setState((){
-              _phase = 6; // CONFIRMATION PAGE
-            });
+        if (state is CalendarLoadedFailure) {
+          setState((){
+            _phase = -1; // Calendar error
+          });
+          print("Calendar Loading Failure state");
+        }
+
+        // PHASE 2 -------
+        if (state is CalendarEventTicketsLoading){
+          print("Event Tickets Loading state");
+          setState((){
+            _phase = 0; // Event Tickets are loading
+          });
+        }
+
+        if (state is CalendarEventTicketsLoadedSuccess){
+          print("Event Tickets Loaded Successfully");
+          setState((){
+            _phase = 2;
+            print(state.eventTickets.toJsonString());
+            eventTicketsGroups = state.eventTickets.data.tickets_groups;
+            if (eventTicketsGroups == null){
+              print("Groups is null");
+            }
+            print("Groups is not null");
+            print("Groups length: " + eventTicketsGroups!.length.toString());
+            for (int i = 0; i < eventTicketsGroups!.length; i++){
+              print("Groups " + i.toString());
+              for (int j = 0; j < eventTicketsGroups![i].tickets.length; j++){
+                print("Ticket name: " + eventTicketsGroups![i].tickets[j].ticket_name);
+              }
+            }
+          });
+        }
+
+        if (state is CalendarEventTicketsLoadedFailure){
+          setState((){
+            _phase = -1; // Calendar error
+          });
+          print("event Tickets Loaded Failure");
+        }
+
+        // PHASE 3 -------
+        if (state is CalendarEventFormLoading){
+          setState((){
+            _phase = 0; // Loading
+          });
+          print("Event Form Loading");
+        }
+
+        if (state is CalendarEventFormLoadedSuccess){
+          setState((){
+            _phase = 3;
+            // print(state.eventForm.toJsonString());
+            _formData = state.eventForm.data;
+            // eventTicketsGroups = state.eventTickets.data.tickets_groups;
+            if (_formData == null){
+              print("Form is null");
+            }
+            print("Form is not null");
+            print("Form Fields length: " + _formData!.fields.length.toString());
+            for (int i = 0; i < _formData!.fields.length; i++){
+              print("Field " + i.toString());
+              print("Field name: " + _formData!.fields[i].field_text);
+            }
+          });
+        }
+
+        if (state is CalendarEventFormLoadedFailure){
+          setState((){
+            _phase = -1; // Calendar error
+          });
+          print("Event Form Loaded Failure");
+        }
+
+        // PHASE 4 ------
+        if (state is CalendarBookingFirstStepLoading){
+          setState((){
+            _phase = 0; // Loading
+          });
+          print("Booking First Step Loading");
+        }
+
+        if (state is CalendarBookingFirstStepLoadedSuccess){
+          print("BOOKING FIRST STEP DATA RECEIVED!");
+          print(state.bookingFirstStepResponse.toJsonString());
+          _bookingFirstStepData = state.bookingFirstStepResponse.data;
+
+          _is_button_disabled = false;
+
+          if (_bookingFirstStepData == null || !_bookingFirstStepData!.pre_booked){
+            showDialog(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                title: const Text("Alert Dialog Box"),
+                content: const Text("You have raised a Alert Dialog Box"),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(ctx).pop();
+                    },
+                    child: Container(
+                      color: Colors.green,
+                      padding: const EdgeInsets.all(14),
+                      child: const Text("okay"),
+                    ),
+                  ),
+                ],
+              ),
+            );
           }
           else{
+            setState((){
+              _phase = 5;
+            });
+          }
+
+        }
+
+        if (state is CalendarBookingFirstStepLoadedFailure){
+          _is_button_disabled = false;
+          print("Booking First Step Failure");
+          setState((){
+            _phase = -1; // Calendar error
+          });
+        }
+
+        // PHASE 5 -------
+        if (state is CalendarBookingSecondStepLoading){
+          setState((){
+            _phase = 0; // Loading
+          });
+          print("Booking Second Step Loading");
+        }
+
+        if (state is CalendarBookingSecondStepLoadedSuccess){
+          _bookingSecondStepData = state.bookingSecondStepResponse.data;
+          // able the button to see the confirmation if booking is confirmed
+          if (_bookingSecondStepData == null){
             // TODO: ERROR, show dialog
-            print("second step returns booked = false");
+            print("second step result is null");
+          }else{
+            if (_bookingSecondStepData!.booked){
+              setState((){
+                _phase = 6; // CONFIRMATION PAGE
+              });
+            }
+            else{
+              // TODO: ERROR, show dialog
+              print("second step returns booked = false");
+            }
           }
         }
-      }
 
-      if (state is CalendarBookingSecondStepLoadedFailure){
-        print("Booking Second Step Failure");
-      }
+        if (state is CalendarBookingSecondStepLoadedFailure){
+          setState((){
+            _phase = -1; // Calendar error
+          });
+          print("Booking Second Step Failure");
+        }
 
-    } , child: BlocBuilder<CalendarBloc, CalendarState>(builder: (context, state) {
+      } , child: BlocBuilder<CalendarBloc, CalendarState>(builder: (context, state) {
       return SizedBox(
         width: 400,
         child: Container(
@@ -1176,7 +1310,7 @@ class CalendarWidgetState extends State<CalendarWidget>{
           _phase == 3 ? _booking_phase_3 :
           _phase == 4 ? _booking_phase_4 :
           _phase == 5 ? _booking_phase_5 :
-          _phase == 6 ? _booking_phase_6 : Text("PHASE X")
+          _phase == 6 ? _booking_phase_6 : error_in_any_state
         )
       );
 
