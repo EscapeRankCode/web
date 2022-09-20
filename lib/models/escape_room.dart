@@ -117,8 +117,9 @@ class EscapeRoom extends Equatable {
           name: "Historia"
       ),
     ];
+    /*
     json['description'] = "¡Infíltrate, cumple con tu objetivo y escapa! Según nuestros informadores, se está experimentando con sustancias sumamente peligrosas en la Mansión Odisea, a las afueras del rancho Trashville. Hemos enviado al equipo Bravo para conseguir más información al respecto, pero han desaparecido sin dejar rastro alguno. Nuestra última conexión con el equipo Bravo fue hace 36 horas. Ante el fracaso de Bravo nos vemos obligados a contratar al mejor equipo de infiltración conocido…. ¡Vosotros! Sois el último as en la manga que tenemos, os necesitamos para saber que está sucediendo. ¿Os atrevéis?";
-
+    */
     List<ImageEscapeRoom> imagesList = [];
     if(json["images"] != null) {
       var imagesFromJson = json["images"] as List;

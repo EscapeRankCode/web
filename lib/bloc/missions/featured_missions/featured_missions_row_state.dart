@@ -13,6 +13,6 @@ class FeaturedMissionsRowStateError extends FeaturedMissionsRowState{
 // NEW missions states
 class FeaturedMissionsRowStateLoaded extends FeaturedMissionsRowState{
   // Escapes that will be in the 'New' row
-  final EscapeRoomsList list;
-  FeaturedMissionsRowStateLoaded(this.list);
+  final List<EscapeRoom> escaperooms;
+  FeaturedMissionsRowStateLoaded(this.escaperooms);
 }

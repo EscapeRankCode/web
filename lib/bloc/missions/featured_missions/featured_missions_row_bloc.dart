@@ -1,6 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_escaperank_web/bloc/missions/featured_missions/featured_missions_row_event.dart';
+import 'package:flutter_escaperank_web/models/escape_room.dart';
 import 'package:flutter_escaperank_web/models/escaperooms_list.dart';
+import 'package:flutter_escaperank_web/models/featured_list.dart';
 import 'package:flutter_escaperank_web/services/escaperoom_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -30,9 +32,11 @@ class FeaturedMissionsRowBloc extends Bloc<FeaturedMissionsRowEvent, FeaturedMis
     try {
       // TODO: Get location
       // TODO: Change called function from getNewMissions to getFeaturedMissions (payment...)
-      escapeRoomsList = await escapeRoomServices.getNewMissions(prefs?.getString("token") ?? "error");
-      if (escapeRoomsList != null) {
-        yield FeaturedMissionsRowStateLoaded(escapeRoomsList!);
+      FeaturedList? escapes = await escapeRoomServices.getFeatured(0, 0, 2);
+
+      // escapeRoomsList = await escapeRoomServices.getNewMissions(prefs?.getString("token") ?? "error");
+      if (escapes != null) {
+        yield FeaturedMissionsRowStateLoaded(escapes.escaperooms);
       } else {
         yield FeaturedMissionsRowStateError("error.topics");
       }

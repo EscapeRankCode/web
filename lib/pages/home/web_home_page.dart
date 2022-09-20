@@ -138,7 +138,7 @@ class _WebHomePageState extends State<_WebHomePage>{
                     BlocBuilder<FeaturedMissionsRowBloc, FeaturedMissionsRowState>(
                         builder: (BuildContext context, FeaturedMissionsRowState state) {
                           if (state is FeaturedMissionsRowStateLoaded) {
-                            List<EscapeRoom> missions = state.list.escaperooms;
+                            List<EscapeRoom> missions = state.escaperooms;
                             return bigger_row(missions);
                           }
                           return const Center(
