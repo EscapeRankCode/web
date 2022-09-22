@@ -263,4 +263,19 @@ class AppTextStyles{
       fontFamily: "Montserrat_Bold"
   );
 
+  // RESUMEN DE LA RESERVA
+  static const TextStyle bookingResumeEntryTitle = TextStyle(
+      color: AppColors.whiteText,
+      fontSize: 14,
+      fontWeight: FontWeight.bold,
+      fontFamily: "Montserrat_Bold"
+  );
+
+  static const TextStyle bookingResumeEntryValue = TextStyle(
+      color: AppColors.whiteText,
+      fontSize: 14,
+      fontWeight: FontWeight.normal,
+      fontFamily: "Montserrat_Regular"
+  );
+
 }

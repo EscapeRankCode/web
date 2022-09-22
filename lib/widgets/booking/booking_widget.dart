@@ -50,7 +50,7 @@ class BookingsWidget extends StatefulWidget{
 class _BookingsWidgetState extends State<BookingsWidget>{
   // Final fields
   final EscapeRoom escapeRoom;
-  SharedPreferences? prefs;
+  // SharedPreferences? prefs;
 
 
   _BookingsWidgetState(this.escapeRoom);
@@ -58,7 +58,7 @@ class _BookingsWidgetState extends State<BookingsWidget>{
 
   @override
   Widget build(BuildContext context) {
-    getSharedPreferences();
+    // getSharedPreferences();
     return Container(
       alignment: Alignment.center,
       child: BlocProvider<CalendarBloc>(
@@ -70,7 +70,7 @@ class _BookingsWidgetState extends State<BookingsWidget>{
 
 
   void getSharedPreferences() async{
-    prefs = await SharedPreferences.getInstance();
+    //prefs = await SharedPreferences.getInstance();
   }
 }
 
@@ -946,6 +946,7 @@ class CalendarWidgetState extends State<CalendarWidget>{
 
     var _booking_phase_4 = Column(
       children: [
+        const SizedBox(height: 30),
         StandardText(
             colorText: AppTextStyles.bookingResumeTitle.color!,
             text: FlutterI18n.translate(context, "booking_resume"),
@@ -954,6 +955,54 @@ class CalendarWidgetState extends State<CalendarWidget>{
             lineHeight: 1,
             align: TextAlign.start
         ),
+        const SizedBox(height: 30),
+
+        // TODO: LIST OF BOOKING DETAILS
+        Row(
+          children: [
+            const SizedBox(width: 30),
+            StandardText(
+                colorText: AppTextStyles.bookingResumeEntryTitle.color!,
+                text: FlutterI18n.translate(context, "resume_day"),
+                fontSize: AppTextStyles.bookingResumeEntryTitle.fontSize!,
+                fontFamily: AppTextStyles.bookingResumeEntryTitle.fontFamily!,
+                lineHeight: 1,
+                align: TextAlign.start
+            ),
+            StandardText(
+                colorText: AppTextStyles.bookingResumeEntryValue.color!,
+                text: DateFormat('dd/MM/yyyy').format(_currentDate2),
+                fontSize: AppTextStyles.bookingResumeEntryValue.fontSize!,
+                fontFamily: AppTextStyles.bookingResumeEntryValue.fontFamily!,
+                lineHeight: 1,
+                align: TextAlign.start
+            ),
+          ],
+        ),
+
+        Row(
+          children: [
+            const SizedBox(width: 30),
+            StandardText(
+                colorText: AppTextStyles.bookingResumeEntryTitle.color!,
+                text: FlutterI18n.translate(context, "resume_time"),
+                fontSize: AppTextStyles.bookingResumeEntryTitle.fontSize!,
+                fontFamily: AppTextStyles.bookingResumeEntryTitle.fontFamily!,
+                lineHeight: 1,
+                align: TextAlign.start
+            ),
+            StandardText(
+                colorText: AppTextStyles.bookingResumeEntryValue.color!,
+                // text: selectedEvent!.time,
+                text: selectedSlot == null ? "" : selectedSlot!.event.time,
+                fontSize: AppTextStyles.bookingResumeEntryValue.fontSize!,
+                fontFamily: AppTextStyles.bookingResumeEntryValue.fontFamily!,
+                lineHeight: 1,
+                align: TextAlign.start
+            ),
+          ],
+        ),
+
         const SizedBox(height: 30),
         StandardButton(
             colorButton: !_is_button_disabled ? AppColors.yellowPrimary : AppColors.primaryYellow30,
@@ -976,6 +1025,7 @@ class CalendarWidgetState extends State<CalendarWidget>{
 
     var _booking_phase_5 = Column( // PAGO DE LA RESERVA
       children: [
+        const SizedBox(height: 30),
         StandardText(
             colorText: AppTextStyles.paymentTitle.color!,
             text: FlutterI18n.translate(context, "payment_title"),
@@ -983,6 +1033,29 @@ class CalendarWidgetState extends State<CalendarWidget>{
             fontFamily: AppTextStyles.paymentTitle.fontFamily!,
             lineHeight: 1,
             align: TextAlign.start
+        ),
+        const SizedBox(height: 30),
+        Row(
+          children: [
+            const SizedBox(width: 30),
+            StandardText(
+                colorText: AppTextStyles.bookingResumeEntryTitle.color!,
+                text: FlutterI18n.translate(context, "needs_to_pay"),
+                fontSize: AppTextStyles.bookingResumeEntryTitle.fontSize!,
+                fontFamily: AppTextStyles.bookingResumeEntryTitle.fontFamily!,
+                lineHeight: 1,
+                align: TextAlign.start
+            ),
+            StandardText(
+                colorText: AppTextStyles.bookingResumeEntryValue.color!,
+                // text: selectedEvent!.time,
+                text: _bookingFirstStepData == null ? "€" : _bookingFirstStepData!.total_price.toString() + "€",
+                fontSize: AppTextStyles.bookingResumeEntryValue.fontSize!,
+                fontFamily: AppTextStyles.bookingResumeEntryValue.fontFamily!,
+                lineHeight: 1,
+                align: TextAlign.start
+            ),
+          ],
         ),
         const SizedBox(height: 30),
         StandardButton(

@@ -299,5 +299,8 @@
   "not_reservable": "Horario no disponible",
   "book_on_the_web": "Reservar en la web",
   "booking_state_error": "Ha ocurrido un error.",
-  "try_again": "Probar de nuevo"
+  "try_again": "Probar de nuevo",
+  "resume_day": "Día de la reserva: ",
+  "resume_time": "Hora de la reserva: ",
+  "needs_to_pay": "Total a pagar: "
 }
