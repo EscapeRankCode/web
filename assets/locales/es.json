@@ -294,7 +294,7 @@
   "form_error_empty_date": "Por favor, seleccione alguna fecha",
   "booking_resume": "Resumen de la reserva",
   "payment_title": "Pago de la reserva",
-  "booking_confirm_title": "Confirmación de la reserva",
+  "booking_confirm_title": "Reserva realizada con éxito",
   "loading": "Cargando...",
   "not_reservable": "Horario no disponible",
   "book_on_the_web": "Reservar en la web",
@@ -302,5 +302,6 @@
   "try_again": "Probar de nuevo",
   "resume_day": "Día de la reserva: ",
   "resume_time": "Hora de la reserva: ",
-  "needs_to_pay": "Total a pagar: "
+  "needs_to_pay": "Total a pagar: ",
+  "back_home": "Volver al inicio"
 }

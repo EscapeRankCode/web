@@ -141,7 +141,7 @@ class CalendarWidgetState extends State<CalendarWidget>{
   void initState() {
     super.initState();
     // Initial days
-    initial_day_month = DateFormat('dd/MM/yyyy').format(DateTime(now_datetime.year, now_datetime.month, 1));
+    initial_day_month = DateFormat('dd/MM/yyyy').format(DateTime(now_datetime.year, now_datetime.month, now_datetime.day));
     final_day_month = DateFormat('dd/MM/yyyy').format(DateTime(now_datetime.year, now_datetime.month+1, 0));
 
     // Load events of the actual month
@@ -316,10 +316,12 @@ class CalendarWidgetState extends State<CalendarWidget>{
           DateTime date1 = DateTime(date.year, date.month, 1);
           DateTime date2 = DateTime(date.year, date.month + 1, 0);
 
+          /* TODO: BE CAREFUL --> REMOVED
           loadEvents(
             DateFormat('dd/MM/yyyy').format(date1),
             DateFormat('dd/MM/yyyy').format(date2)
           );
+           */
           // checkSlots(_currentDate2);
         });
       },
@@ -414,7 +416,11 @@ class CalendarWidgetState extends State<CalendarWidget>{
                   var last_day_date = DateTime(_targetDateTime.year, _targetDateTime.month, 0);
                   _targetDateTime = DateTime(_targetDateTime.year, _targetDateTime.month - 1);
                   _currentMonth = DateFormat.MMMM("es_ES").format(_targetDateTime).toUpperCase();
-                  String _startDate = "01/" + _targetDateTime.month.toString() + "/" + _targetDateTime.year.toString();
+                  String _start_day_back = "01/";
+                  if (_targetDateTime.month == _currentDate.month){
+                    _start_day_back = DateFormat('dd/').format(_currentDate);
+                  }
+                  String _startDate = _start_day_back + _targetDateTime.month.toString() + "/" + _targetDateTime.year.toString();
                   String _endDate = last_day_date.day.toString() + "/" + _targetDateTime.month.toString() + "/" + _targetDateTime.year.toString();
                   loadEvents(
                       _startDate,
@@ -557,6 +563,7 @@ class CalendarWidgetState extends State<CalendarWidget>{
       ],
     );
 
+    // PHASE 3 (FORM)
     var _booking_phase_3 = Column(
       children: [
         const SizedBox(height: 12),
@@ -944,6 +951,7 @@ class CalendarWidgetState extends State<CalendarWidget>{
       ],
     );
 
+    // PHASE 4 (BOOKING SUMMARY)
     var _booking_phase_4 = Column(
       children: [
         const SizedBox(height: 30),
@@ -1021,8 +1029,9 @@ class CalendarWidgetState extends State<CalendarWidget>{
             }
         )
       ],
-    ); // RESUMEN DE RESERVA
+    );
 
+    // PHASE 5 (PAYMENT)
     var _booking_phase_5 = Column( // PAGO DE LA RESERVA
       children: [
         const SizedBox(height: 30),
@@ -1078,9 +1087,10 @@ class CalendarWidgetState extends State<CalendarWidget>{
       ],
     );
 
+    // PHASE 6 (BOOKING CONFIRMATION AFTER PAYMENT)
     var _booking_phase_6 = Column(
       children: [
-        const Text("PHASE 6"),
+        const SizedBox(height: 30),
         StandardText(
             colorText: AppTextStyles.confirmationTitle.color!,
             text: FlutterI18n.translate(context, "booking_confirm_title"),
@@ -1089,6 +1099,67 @@ class CalendarWidgetState extends State<CalendarWidget>{
             lineHeight: 1,
             align: TextAlign.start
         ),
+
+        const SizedBox(height: 30),
+
+        Row(
+          children: [
+            const SizedBox(width: 30),
+            StandardText(
+                colorText: AppTextStyles.bookingResumeEntryTitle.color!,
+                text: FlutterI18n.translate(context, "resume_day"),
+                fontSize: AppTextStyles.bookingResumeEntryTitle.fontSize!,
+                fontFamily: AppTextStyles.bookingResumeEntryTitle.fontFamily!,
+                lineHeight: 1,
+                align: TextAlign.start
+            ),
+            StandardText(
+                colorText: AppTextStyles.bookingResumeEntryValue.color!,
+                text: DateFormat('dd/MM/yyyy').format(_currentDate2),
+                fontSize: AppTextStyles.bookingResumeEntryValue.fontSize!,
+                fontFamily: AppTextStyles.bookingResumeEntryValue.fontFamily!,
+                lineHeight: 1,
+                align: TextAlign.start
+            ),
+          ],
+        ),
+
+        Row(
+          children: [
+            const SizedBox(width: 30),
+            StandardText(
+                colorText: AppTextStyles.bookingResumeEntryTitle.color!,
+                text: FlutterI18n.translate(context, "resume_time"),
+                fontSize: AppTextStyles.bookingResumeEntryTitle.fontSize!,
+                fontFamily: AppTextStyles.bookingResumeEntryTitle.fontFamily!,
+                lineHeight: 1,
+                align: TextAlign.start
+            ),
+            StandardText(
+                colorText: AppTextStyles.bookingResumeEntryValue.color!,
+                // text: selectedEvent!.time,
+                text: selectedSlot == null ? "" : selectedSlot!.event.time,
+                fontSize: AppTextStyles.bookingResumeEntryValue.fontSize!,
+                fontFamily: AppTextStyles.bookingResumeEntryValue.fontFamily!,
+                lineHeight: 1,
+                align: TextAlign.start
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 30),
+        StandardButton(
+            colorButton: AppColors.yellowPrimary,
+            standardText: StandardText(
+              text: FlutterI18n.translate(context, "back_home"),
+              fontFamily: "Kanit_Medium",
+              fontSize: 18,
+              colorText: AppColors.white, align: TextAlign.center, lineHeight: 1,
+            ),
+            onPressed: (){
+              Navigator.pop(context);
+            }
+        )
       ],
     );
 
